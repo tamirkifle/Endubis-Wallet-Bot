@@ -1,75 +1,34 @@
+const { Telegraf, Markup, Scenes, session } = require("telegraf");
+const { createAccountScene } = require("./scenes/createAccountScene.js");
+const { restoreAccountScene } = require("./scenes/restoreAccountScene.js");
+const { mainMenuHandler } = require("./handlers/mainMenuHandler");
+
 require("dotenv").config();
 
-const { Seed } = require("cardano-wallet-js");
+const token = process.env.TG_BOT_TOKEN;
+if (token === undefined) {
+  throw new Error("TG_BOT_TOKEN must be provided!");
+}
 
-const { Telegraf, Markup } = require("telegraf");
+const bot = new Telegraf(token);
 
-const bot = new Telegraf(process.env.TG_BOT_API || "");
+const stage = new Scenes.Stage([createAccountScene, restoreAccountScene]);
+bot.use(session());
+bot.use(stage.middleware());
 
-bot.start((ctx) => {
-  ctx.reply(
-    "Welcome to the Wallet Bot",
-    Markup.inlineKeyboard([
-      Markup.button.callback("Create New Wallet", "create-wallet"),
-      Markup.button.callback(
-        "Restore a Wallet with Seed Phrase",
-        "restore-wallet"
-      ),
-    ])
-  );
-});
+bot.start(mainMenuHandler);
 
-bot.action("create-wallet", (ctx) => {
-  const seedPhrase =
-    "Here's your seed phrase, keep it safe: \n" +
-    Seed.generateRecoveryPhrase(21)
-      .split(" ")
-      .map((phrase) => `||*${phrase}*||`)
-      .join(" ");
+bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
-  ctx.reply(seedPhrase, {
-    parse_mode: "MarkdownV2",
-    ...Markup.inlineKeyboard([
-      Markup.button.callback(
-        "Delete It, I have written it down",
-        "delete_message"
-      ),
-      Markup.button.callback(
-        "Keep It Here, I don't care",
-        "recover_with_phrase"
-      ),
-    ]),
-  });
-  // ctx.telegram.sendMessage(ctx.chat.id, seedPhrase, {
-  //   parse_mode: "MarkdownV2",
-  //   reply_markup: {
-  //     inline_keyboard: [
-  //       [
-  //         {
-  //           text: "Delete It, I have written it down",
-  //           callback_data: "delete_previous",
-  //         },
-  //         {
-  //           text: "Keep It Here, I don't care",
-  //           callback_data: "recover_with_phrase",
-  //         },
-  //       ],
-  //     ],
-  //   },
-  // });
-});
+bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 
-bot.action("delete_message", (ctx) => {
-  ctx.answerCbQuery();
+//Handles all Back to Menu clicks outside scenes
+bot.action("back-to-menu", mainMenuHandler);
+
+//THis will only activate if called outside the scene: createAccountScene, eg. if auser clicks an older message with the delete button
+//So Just delete and don't try to restore the wallet
+bot.action("delete-then-restore", (ctx) => {
   ctx.deleteMessage();
-});
-
-bot.action("recover_with_phrase", (ctx) => {
-  ctx.answerCbQuery();
-  ctx.reply(
-    "Please enter your seed key to access your account",
-    Markup.forceReply()
-  );
 });
 
 bot.launch();
