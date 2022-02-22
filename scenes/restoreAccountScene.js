@@ -73,6 +73,10 @@ step2.use((ctx) => {
 const step3 = new Composer();
 
 step3.on("text", (ctx) => {
+  if (ctx.message.text.length < 10) {
+    ctx.reply(`Passphrase must be at least 10 characters long. Try again`);
+    return;
+  }
   ctx.scene.state.passphrase = ctx.message.text;
   ctx.reply(
     `Please enter a name for this wallet`,
