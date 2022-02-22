@@ -21,6 +21,8 @@ const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
         .split(" However")[0];
       const existingWallet = await getWalletById(existingWalletId);
       return existingWallet;
+    } else {
+      throw e;
     }
   }
 };
