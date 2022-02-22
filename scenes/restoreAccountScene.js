@@ -7,7 +7,7 @@ const {
 
 /*
 Step 1: 
-- Ask user for the seed phrase with an option to cancel and go back to the main menu
+- Ask user for the seed phrase (with an option to cancel and go back to the main menu)
 */
 
 const step1 = (ctx) => {
@@ -23,11 +23,11 @@ const step1 = (ctx) => {
 /*
 Step 2: 
 - Validate the Seed Phrase
+- Check if wallet already exists
 - Ask user for Passphrase
--  
+-  Store it in local state
 */
 const step2 = new Composer();
-let seedPhrases = "";
 
 step2.on("text", (ctx) => {
   //TODO: Validate the seed phrase
@@ -40,19 +40,7 @@ step2.on("text", (ctx) => {
     );
     return;
   }
-  seedPhrases = ctx.message.text;
-  ctx.reply(
-    "I have received the seed phrase...",
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
-  return ctx.wizard.next();
-});
-
-const step3 = new Composer();
-
-step3.use((ctx) => {
+  ctx.scene.state.seedPhrases = ctx.message.text;
   ctx.reply(
     `Please enter a passphrase to secure you account (10 characters or more)`,
     Markup.inlineKeyboard([
@@ -60,38 +48,6 @@ step3.use((ctx) => {
     ])
   );
   return ctx.wizard.next();
-});
-
-const step4 = new Composer();
-
-let passphrase = "";
-step4.on("text", (ctx) => {
-  passphrase = ctx.message.text;
-  console.log({ passphrase });
-  ctx.reply(
-    `Please enter a name for this wallet`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
-  return ctx.wizard.next();
-});
-
-const step5 = new Composer();
-
-let walletName = "";
-step5.on("text", async (ctx) => {
-  walletName = ctx.message.text;
-  console.log({ walletName, passphrase });
-  const wallet = await loadAccountFromSeed(seedPhrases, passphrase, walletName);
-
-  ctx.reply(
-    formatWalletData(wallet),
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
-  return ctx.scene.leave();
 });
 
 //If asked to go back to menu, handle that action and don't trying the fallback handler on step2.use
@@ -107,13 +63,55 @@ step2.use((ctx) => {
   return;
 });
 
+/*
+  Step 3
+  - Validate passphrase
+  - Save passphrase in local state
+  - Ask user for wallet name
+  */
+
+const step3 = new Composer();
+
+step3.on("text", (ctx) => {
+  ctx.scene.state.passphrase = ctx.message.text;
+  ctx.reply(
+    `Please enter a name for this wallet`,
+    Markup.inlineKeyboard([
+      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
+    ])
+  );
+  return ctx.wizard.next();
+});
+
+/* 
+  Step 4
+  - Validate Wallet Name if there are any reqts.
+  - Load wallet from data in local state
+  */
+
+const step4 = new Composer();
+
+step4.on("text", async (ctx) => {
+  ctx.scene.state.walletName = ctx.message.text;
+  const { seedPhrases, walletName, passphrase } = ctx.scene.state;
+  const wallet = await loadAccountFromSeed(seedPhrases, passphrase, walletName);
+  //TODO: handle thrown errors
+  //TODO: Handle Exisitng Wallets
+  ctx.reply(
+    formatWalletData(wallet),
+    Markup.inlineKeyboard([
+      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
+    ])
+  );
+  return ctx.scene.leave();
+});
+
 const restoreAccountScene = new Scenes.WizardScene(
   "restoreAccountScene",
   (ctx) => step1(ctx),
   step2,
   step3,
-  step4,
-  step5
+  step4
 );
 
 module.exports = { restoreAccountScene };
