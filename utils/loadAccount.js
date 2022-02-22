@@ -1,16 +1,15 @@
 const { Seed, WalletServer } = require("cardano-wallet-js");
 
 let walletServer = WalletServer.init("http://localhost:8090/v2");
+
 const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
   const seedArray = Seed.toMnemonicList(seedPhrases);
   try {
-    let wallet = await walletServer.createOrRestoreShelleyWallet(
+    const wallet = await walletServer.createOrRestoreShelleyWallet(
       walletName,
       seedArray,
       passphrase
     );
-    console.log(wallet);
-
     return wallet;
   } catch (e) {
     if (e.response.data.code === "wallet_already_exists") {
@@ -21,29 +20,32 @@ const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
         .split("id: ")[1]
         .split(" However")[0];
       const existingWallet = await getWalletById(existingWalletId);
-      console.log(existingWallet);
       return existingWallet;
     }
   }
 };
 
-getWalletById = (walletId) => {
-  return walletServer.getShelleyWallet(walletId);
+const getWalletById = async (walletId) => {
+  const wallet = walletServer.getShelleyWallet(walletId);
+  return wallet;
 };
 
-getWalletByName = async (walletName) => {
+const getWalletByName = async (walletName) => {
   let wallets = await walletServer.wallets();
   let foundWallet = wallets.find((wallet) => wallet.name === walletName);
   return foundWallet;
 };
 
-formatWalletData = (wallet) => {
+const formatWalletData = (wallet) => {
+  console.log(wallet);
   return `Here's your wallet information: 
+
 Wallet Name: ${wallet.name}
-Wallet Total Balance: ${wallet.balance.total.quantity / 100000} ADA
-Wallet Available Balance: ${wallet.balance.total.available / 100000} ADA
-  `;
+Wallet Total Balance: ${wallet.balance.total.quantity / 1000000} ADA
+Wallet Available Balance: ${wallet.balance.available.quantity / 1000000} ADA
+`;
 };
+
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
   console.log(wallets);
@@ -63,14 +65,14 @@ const getTransactions = async (wallet) => {
 // );
 
 //account-2
-loadAccountFromSeed(
-  "exercise cycle law pig success shaft ship ripple second pave slab card cotton lens eight",
-  "passwordistamir",
-  "tamir-test-wallet"
-);
+// loadAccountFromSeed(
+//   "exercise cycle law pig success shaft ship ripple second pave slab card cotton lens eight",
+//   "passwordistamir",
+//   "tamir-test-wallet"
+// );
 
 (async function () {
   // console.log(await getWalletByName("test-wallet"));
 })();
 
-module.exports = { loadAccountFromSeed };
+module.exports = { loadAccountFromSeed, formatWalletData };
