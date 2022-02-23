@@ -3,24 +3,33 @@ const { Markup } = require("telegraf");
 const mainMenuHandler = (ctx) => {
   //If in a scene, leave it.
   ctx.scene?.leave();
-  console.log("Main Menu Called");
   if (ctx.session?.loggedInWalletId) {
-    ctx.reply(
-      "Welcome back",
+    const userFirstName =
+      ctx.update?.message?.from?.first_name ??
+      ctx.update?.callback_query?.from?.first_name;
+    const userId =
+      ctx.update?.message?.from?.id ?? ctx.update?.callback_query?.from?.id;
+
+    if (ctx.update.message?.text === "/start") {
+      ctx.replyWithMarkdownV2(
+        `👋 Welcome back to your wallet, [${userFirstName}](tg://user?id=${userId})`
+      );
+    }
+
+    ctx.replyWithMarkdownV2(
+      `Please choose an option, [${userFirstName}](tg://user?id=${userId})`,
       Markup.inlineKeyboard([
-        Markup.button.callback("View Balances", "wallet-balances"),
-        Markup.button.callback("Log Out", "log-out"),
+        [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
+        [Markup.button.callback(" ⚙️ Manage Account", "manage-account")],
+        [Markup.button.callback("🚪 Logout", "log-out")],
       ])
     );
   } else {
-    ctx.reply(
-      "Welcome to the Wallet Bot",
+    ctx.replyWithMarkdownV2(
+      `Please *CREATE* or *RESTORE* a wallet to get started`,
       Markup.inlineKeyboard([
-        Markup.button.callback("Create New Wallet", "create-wallet"),
-        Markup.button.callback(
-          "Restore a Wallet with Seed Phrase",
-          "restore-wallet"
-        ),
+        [Markup.button.callback("🆕 Create a New Wallet", "create-wallet")],
+        [Markup.button.callback("🗝 Restore a Wallet", "restore-wallet")],
       ])
     );
   }
