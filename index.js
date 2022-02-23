@@ -2,9 +2,10 @@ const { Telegraf, Markup, Scenes } = require("telegraf");
 const LocalSession = require("telegraf-session-local");
 const CryptoJS = require("crypto-js");
 
-const { createAccountScene } = require("./scenes/createAccountScene.js");
-const { restoreAccountScene } = require("./scenes/restoreAccountScene.js");
+const { createAccountScene } = require("./scenes/createAccountScene");
+const { restoreAccountScene } = require("./scenes/restoreAccountScene");
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
+const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 
 require("dotenv").config();
 
@@ -42,6 +43,7 @@ bot.start(mainMenuHandler);
 bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
+bot.action("wallet-balance", walletBalanceHandler);
 
 //Handles all Back to Menu clicks outside scenes
 bot.action("back-to-menu", mainMenuHandler);

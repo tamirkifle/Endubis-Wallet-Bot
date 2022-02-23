@@ -81,4 +81,4 @@ const getTransactions = async (wallet) => {
   // listWallets();
 })();
 
-module.exports = { loadAccountFromSeed, formatWalletData };
+module.exports = { loadAccountFromSeed, formatWalletData, getWalletById };
