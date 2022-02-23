@@ -50,13 +50,17 @@ Wallet Available Balance: ${wallet.balance.available.quantity / 1000000} ADA
 
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
-  console.log(wallets);
-  let addresses = await wallets[0].getAddresses();
-  // console.log(addresses[0]);
+  // console.log(wallets.map((w) => w.balance.total.quantity / 1000000));
+  return wallets;
+};
+
+const getAddresses = async (wallet) => {
+  const addresses = await wallets.getAddresses();
+  return addresses;
 };
 
 const getTransactions = async (wallet) => {
-  let transactions = await wallet.getTransactions();
+  const transactions = await wallet.getTransactions();
   return transactions;
 };
 //account-1
@@ -74,7 +78,7 @@ const getTransactions = async (wallet) => {
 // );
 
 (async function () {
-  // console.log(await getWalletByName("test-wallet"));
+  // listWallets();
 })();
 
 module.exports = { loadAccountFromSeed, formatWalletData };
