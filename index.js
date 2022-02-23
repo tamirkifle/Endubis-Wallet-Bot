@@ -1,4 +1,6 @@
-const { Telegraf, Markup, Scenes, session } = require("telegraf");
+const { Telegraf, Markup, Scenes } = require("telegraf");
+const LocalSession = require("telegraf-session-local");
+
 const { createAccountScene } = require("./scenes/createAccountScene.js");
 const { restoreAccountScene } = require("./scenes/restoreAccountScene.js");
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
@@ -13,7 +15,7 @@ if (token === undefined) {
 const bot = new Telegraf(token);
 
 const stage = new Scenes.Stage([createAccountScene, restoreAccountScene]);
-bot.use(session());
+bot.use(new LocalSession({ database: "wallet_bot_db.json" }));
 bot.use(stage.middleware());
 
 bot.start(mainMenuHandler);

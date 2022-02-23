@@ -99,6 +99,7 @@ step4.on("text", async (ctx) => {
   ctx.scene.state.walletName = ctx.message.text;
   const { seedPhrases, walletName, passphrase } = ctx.scene.state;
   const wallet = await loadAccountFromSeed(seedPhrases, passphrase, walletName);
+  ctx.session.loggedInWalletId = wallet.id;
   //TODO: handle thrown errors
   //TODO: Handle Exisitng Wallets
   ctx.reply(
