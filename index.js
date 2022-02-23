@@ -1,5 +1,6 @@
 const { Telegraf, Markup, Scenes } = require("telegraf");
 const LocalSession = require("telegraf-session-local");
+const CryptoJS = require("crypto-js");
 
 const { createAccountScene } = require("./scenes/createAccountScene.js");
 const { restoreAccountScene } = require("./scenes/restoreAccountScene.js");
@@ -15,7 +16,25 @@ if (token === undefined) {
 const bot = new Telegraf(token);
 
 const stage = new Scenes.Stage([createAccountScene, restoreAccountScene]);
-bot.use(new LocalSession({ database: "wallet_bot_db.json" }));
+bot.use(
+  new LocalSession({
+    database: "wallet_bot_db",
+    format: {
+      serialize: (obj) =>
+        CryptoJS.AES.encrypt(
+          JSON.stringify(obj, null, 2),
+          process.env.SECRET_KEY || "secret key 123"
+        ).toString(), // null & 2 for pretty-formatted JSON
+      deserialize: (str) =>
+        JSON.parse(
+          CryptoJS.AES.decrypt(
+            str,
+            process.env.SECRET_KEY || "secret key 123"
+          ).toString(CryptoJS.enc.Utf8)
+        ),
+    },
+  })
+);
 bot.use(stage.middleware());
 
 bot.start(mainMenuHandler);
