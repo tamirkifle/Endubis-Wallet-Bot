@@ -4,6 +4,10 @@ const CryptoJS = require("crypto-js");
 
 const { createAccountScene } = require("./scenes/createAccountScene");
 const { restoreAccountScene } = require("./scenes/restoreAccountScene");
+const { manageAccountScene } = require("./scenes/manageAccountScene");
+const {
+  changePassphraseScene,
+} = require("./scenes/manageAccount/changePassphraseScene");
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 
@@ -16,7 +20,12 @@ if (token === undefined) {
 
 const bot = new Telegraf(token);
 
-const stage = new Scenes.Stage([createAccountScene, restoreAccountScene]);
+const stage = new Scenes.Stage([
+  createAccountScene,
+  restoreAccountScene,
+  manageAccountScene,
+  changePassphraseScene,
+]);
 bot.use(
   new LocalSession({
     database: "wallet_bot_db",
@@ -44,6 +53,12 @@ bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action("wallet-balance", walletBalanceHandler);
+bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
+bot.action("log-out", (ctx) => {
+  ctx.session.loggedInWalletId = null;
+  ctx.deleteMessage();
+  mainMenuHandler(ctx);
+});
 
 //Handles all Back to Menu clicks outside scenes
 bot.action("back-to-menu", mainMenuHandler);

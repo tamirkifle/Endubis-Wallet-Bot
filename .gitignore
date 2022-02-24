@@ -1,3 +1,5 @@
 node_modules/
 .env
 wallet_bot_db*
+
+.DS_Store
