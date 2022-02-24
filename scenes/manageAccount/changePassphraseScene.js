@@ -1,5 +1,6 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
+const { changePassphrase } = require("../../utils/loadAccount");
 
 /*
 Steps: 
@@ -29,7 +30,7 @@ Step 2:
 - Validate old passphrase
 - Ask for new Passphrase
 */
-
+let oldPass;
 const step2 = new Composer();
 step2.on("text", (ctx) => {
   if (ctx.update.message?.text.length < 10) {
@@ -41,6 +42,7 @@ step2.on("text", (ctx) => {
     );
     return;
   }
+  oldPass = ctx.update.message?.text;
   ctx.reply(
     `Please enter your desired new passphrase`,
     Markup.inlineKeyboard([
@@ -58,10 +60,10 @@ Step 3:
 */
 
 const step3 = new Composer();
-let newpass;
+let newPass;
 step3.on("text", (ctx) => {
   console.log("New Passphrase reply: ", ctx.update.message?.text);
-  newpass = ctx.update.message?.text;
+  newPass = ctx.update.message?.text;
   if (ctx.update.message?.text.length < 10) {
     ctx.reply("Passphrase can't be less than 10 characters long. Try again.");
     return;
@@ -87,12 +89,12 @@ Step 4:
 
 const step4 = new Composer();
 
-step4.on("text", (ctx) => {
+step4.on("text", async (ctx) => {
   console.log("Repeat Passphrase reply: ", ctx.update.message?.text);
   if (
-    !newpass ||
+    !newPass ||
     !ctx.update.message?.text ||
-    newpass !== ctx.update.message?.text
+    newPass !== ctx.update.message?.text
   ) {
     ctx.reply(
       `The passwords don't match. Please try again
@@ -104,8 +106,22 @@ Please enter your desired new passphrase`,
     );
     return ctx.wizard.selectStep(2);
   }
-  //TODO: CHANGE PASSCODE
   ctx.reply("Changing your passphrase...");
+  try {
+    const result = await changePassphrase(
+      ctx.session?.loggedInWalletId,
+      oldPass,
+      newPass
+    );
+    ctx.reply(
+      "Passphrase was successfully changed",
+      Markup.inlineKeyboard([
+        [Markup.button.callback("Main Menu", "back-to-menu")],
+      ])
+    );
+  } catch (e) {
+    ctx.reply(`🔴 ERROR: ${e.response.data.message.split(":")[0]}`);
+  }
 
   return ctx.scene.leave();
 });

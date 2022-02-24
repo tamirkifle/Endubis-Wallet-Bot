@@ -63,6 +63,14 @@ const getTransactions = async (wallet) => {
   const transactions = await wallet.getTransactions();
   return transactions;
 };
+
+const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
+  debugger;
+  const wallet = await getWalletById(walletId);
+  console.log({ wallet, oldPassphrase, newPassphrase });
+  const result = await wallet.updatePassphrase(oldPassphrase, newPassphrase);
+  return result;
+};
 //account-1
 // loadAccountFromSeed(
 //   "celery trumpet decade draft naive nature antique novel topple slice celery gas fossil transfer wash",
@@ -81,4 +89,9 @@ const getTransactions = async (wallet) => {
   // listWallets();
 })();
 
-module.exports = { loadAccountFromSeed, formatWalletData, getWalletById };
+module.exports = {
+  loadAccountFromSeed,
+  formatWalletData,
+  getWalletById,
+  changePassphrase,
+};
