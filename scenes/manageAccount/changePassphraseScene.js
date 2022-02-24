@@ -1,7 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { changePassphrase } = require("../../utils/loadAccount");
-const { replyMenu } = require("../../utils/replyWithMenu");
+const { replyMenu, replyMenuMDV2 } = require("../../utils/replyWithMenu");
 
 /*
 Steps: 
@@ -98,7 +98,14 @@ step4.on("text", async (ctx) => {
     );
     replyMenu(ctx, "Passphrase was successfully changed");
   } catch (e) {
-    replyMenu(ctx, `🔴 ERROR: \n${e.response.data.message.split(":")[0]}`);
+    replyMenuMDV2(
+      ctx,
+      `🔴 *ERROR* \n\n${
+        e.response.data.code === "wrong_encryption_passphrase"
+          ? "*Wrong Passphrase*\n\nIf you have forgotten your old passphrase, \nplease _*delete your account*_ and restore it again \nto set a new passphrase"
+          : e.response.data.message
+      }`
+    );
   }
 
   return ctx.scene.leave();
