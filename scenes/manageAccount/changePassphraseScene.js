@@ -1,6 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { changePassphrase } = require("../../utils/loadAccount");
+const { replyMenu } = require("../../utils/replyWithMenu");
 
 /*
 Steps: 
@@ -16,12 +17,7 @@ Step 1:
 */
 
 const step1 = (ctx) => {
-  ctx.reply(
-    `Please enter your old passphrase to get started`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, `Please enter your old passphrase to get started`);
   return ctx.wizard.next();
 };
 
@@ -34,21 +30,14 @@ let oldPass;
 const step2 = new Composer();
 step2.on("text", (ctx) => {
   if (ctx.update.message?.text.length < 10) {
-    ctx.reply(
-      "Passphrase can't be less than 10 characters long. Try again.",
-      Markup.inlineKeyboard([
-        [Markup.button.callback("Main Menu", "back-to-menu")],
-      ])
+    replyMenu(
+      ctx,
+      "Passphrase can't be less than 10 characters long. Try again."
     );
     return;
   }
   oldPass = ctx.update.message?.text;
-  ctx.reply(
-    `Please enter your desired new passphrase`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, `Please enter your desired new passphrase`);
   return ctx.wizard.next();
   // return ctx.scene.leave();
 });
@@ -65,15 +54,13 @@ step3.on("text", (ctx) => {
   console.log("New Passphrase reply: ", ctx.update.message?.text);
   newPass = ctx.update.message?.text;
   if (ctx.update.message?.text.length < 10) {
-    ctx.reply("Passphrase can't be less than 10 characters long. Try again.");
+    replyMenu(
+      ctx,
+      "Passphrase can't be less than 10 characters long. Try again."
+    );
     return;
   }
-  ctx.reply(
-    `Please repeat the new passphrase`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, `Please repeat the new passphrase`);
   return ctx.wizard.next();
   // return ctx.scene.leave();
 });
@@ -96,13 +83,9 @@ step4.on("text", async (ctx) => {
     !ctx.update.message?.text ||
     newPass !== ctx.update.message?.text
   ) {
-    ctx.reply(
-      `The passwords don't match. Please try again
-      
-Please enter your desired new passphrase`,
-      Markup.inlineKeyboard([
-        [Markup.button.callback("Main Menu", "back-to-menu")],
-      ])
+    replyMenu(
+      ctx,
+      `The passwords don't match. Please try again.\n\nEnter your desired new passphrase`
     );
     return ctx.wizard.selectStep(2);
   }
@@ -113,14 +96,9 @@ Please enter your desired new passphrase`,
       oldPass,
       newPass
     );
-    ctx.reply(
-      "Passphrase was successfully changed",
-      Markup.inlineKeyboard([
-        [Markup.button.callback("Main Menu", "back-to-menu")],
-      ])
-    );
+    replyMenu(ctx, "Passphrase was successfully changed");
   } catch (e) {
-    ctx.reply(`🔴 ERROR: ${e.response.data.message.split(":")[0]}`);
+    replyMenu(ctx, `🔴 ERROR: \n${e.response.data.message.split(":")[0]}`);
   }
 
   return ctx.scene.leave();
