@@ -23,6 +23,7 @@ const step1 = (ctx) => {
           "change-default-address"
         ),
       ],
+      [Markup.button.callback("Delete Account", "delete-wallet")],
       [Markup.button.callback("Main Menu", "back-to-menu")],
     ])
   );
@@ -37,6 +38,7 @@ Step 2:
 
 const step2 = new Composer();
 step2.action("change-passphrase", Scenes.Stage.enter("changePassphraseScene"));
+step2.action("delete-wallet", Scenes.Stage.enter("deleteWalletScene"));
 
 const manageAccountScene = new Scenes.WizardScene(
   "manageAccountScene",

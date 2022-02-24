@@ -65,10 +65,14 @@ const getTransactions = async (wallet) => {
 };
 
 const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
-  debugger;
   const wallet = await getWalletById(walletId);
-  console.log({ wallet, oldPassphrase, newPassphrase });
   const result = await wallet.updatePassphrase(oldPassphrase, newPassphrase);
+  return result;
+};
+
+const deleteWallet = async (walletId) => {
+  const wallet = await getWalletById(walletId);
+  const result = await wallet.delete();
   return result;
 };
 //account-1
@@ -86,7 +90,7 @@ const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
 // );
 
 (async function () {
-  // listWallets();
+  listWallets();
 })();
 
 module.exports = {
@@ -94,4 +98,5 @@ module.exports = {
   formatWalletData,
   getWalletById,
   changePassphrase,
+  deleteWallet,
 };

@@ -8,6 +8,9 @@ const { manageAccountScene } = require("./scenes/manageAccountScene");
 const {
   changePassphraseScene,
 } = require("./scenes/manageAccount/changePassphraseScene");
+const {
+  deleteWalletScene,
+} = require("./scenes/manageAccount/deleteWalletScene");
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 
@@ -25,6 +28,7 @@ const stage = new Scenes.Stage([
   restoreAccountScene,
   manageAccountScene,
   changePassphraseScene,
+  deleteWalletScene,
 ]);
 bot.use(
   new LocalSession({
