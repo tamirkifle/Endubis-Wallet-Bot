@@ -18,12 +18,6 @@ const step1 = (ctx) => {
     Markup.inlineKeyboard([
       [Markup.button.callback("Change Passphrase", "change-passphrase")],
       [Markup.button.callback("Change Wallet Name", "change-wallet-name")],
-      [
-        Markup.button.callback(
-          "Change Default Address",
-          "change-default-address"
-        ),
-      ],
       [Markup.button.callback("Delete Account", "delete-wallet")],
       [mainMenuButton()],
     ])

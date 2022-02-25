@@ -55,7 +55,7 @@ const listWallets = async () => {
 };
 
 const getAddresses = async (wallet) => {
-  const addresses = await wallets.getAddresses();
+  const addresses = await wallet.getAddresses();
   return addresses;
 };
 
@@ -99,4 +99,5 @@ module.exports = {
   getWalletById,
   changePassphrase,
   deleteWallet,
+  getAddresses,
 };
