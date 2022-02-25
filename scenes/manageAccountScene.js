@@ -1,5 +1,6 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
+const { mainMenuButton } = require("../utils/btnMenuHelpers");
 const {
   changePassphraseScene,
 } = require("./manageAccount/changePassphraseScene");
@@ -24,7 +25,7 @@ const step1 = (ctx) => {
         ),
       ],
       [Markup.button.callback("Delete Account", "delete-wallet")],
-      [Markup.button.callback("Main Menu", "back-to-menu")],
+      [mainMenuButton()],
     ])
   );
   return ctx.wizard.next();

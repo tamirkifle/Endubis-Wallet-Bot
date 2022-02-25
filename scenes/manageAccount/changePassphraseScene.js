@@ -1,7 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { changePassphrase } = require("../../utils/loadAccount");
-const { replyMenu, replyMenuMDV2 } = require("../../utils/replyWithMenu");
+const { replyMenu, replyMenuMDV2 } = require("../../utils/btnMenuHelpers");
 
 /*
 Steps: 

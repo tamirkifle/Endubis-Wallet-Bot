@@ -1,5 +1,6 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
+const { replyMenu } = require("../utils/btnMenuHelpers");
 const {
   loadAccountFromSeed,
   formatWalletData,
@@ -11,12 +12,7 @@ Step 1:
 */
 
 const step1 = (ctx) => {
-  ctx.reply(
-    `Please enter your seed key to access your account`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, `Please enter your seed key to access your account`);
   return ctx.wizard.next();
 };
 
@@ -32,20 +28,13 @@ const step2 = new Composer();
 step2.on("text", (ctx) => {
   //TODO: Validate the seed phrase
   if (ctx.message.text.trim().split(" ").length < 15) {
-    ctx.reply(
-      "That doesn't seem like a valid seed phrase. Try Again",
-      Markup.inlineKeyboard([
-        [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-      ])
-    );
+    replyMenu(ctx, "That doesn't seem like a valid seed phrase. Try Again");
     return;
   }
   ctx.scene.state.seedPhrases = ctx.message.text;
-  ctx.reply(
-    `Please enter a passphrase to secure you account (10 characters or more)`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
+  replyMenu(
+    ctx,
+    `Please enter a passphrase to secure you account (10 characters or more)`
   );
   return ctx.wizard.next();
 });
@@ -54,12 +43,7 @@ step2.on("text", (ctx) => {
 step2.action("back-to-menu", mainMenuHandler);
 
 step2.use((ctx) => {
-  ctx.reply(
-    "Only Text supported for your seed phrase. Try Again.",
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, "Only Text supported for your seed phrase. Try Again.");
   return;
 });
 
@@ -74,16 +58,11 @@ const step3 = new Composer();
 
 step3.on("text", (ctx) => {
   if (ctx.message.text.length < 10) {
-    ctx.reply(`Passphrase must be at least 10 characters long. Try again`);
+    replyMenu(ctx, `Passphrase must be at least 10 characters long. Try again`);
     return;
   }
   ctx.scene.state.passphrase = ctx.message.text;
-  ctx.reply(
-    `Please enter a name for this wallet`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, `Please enter a name for this wallet`);
   return ctx.wizard.next();
 });
 
@@ -102,12 +81,7 @@ step4.on("text", async (ctx) => {
   ctx.session.loggedInWalletId = wallet.id;
   //TODO: handle thrown errors
   //TODO: Handle Exisitng Wallets
-  ctx.reply(
-    formatWalletData(wallet),
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-    ])
-  );
+  replyMenu(ctx, formatWalletData(wallet));
   return ctx.scene.leave();
 });
 

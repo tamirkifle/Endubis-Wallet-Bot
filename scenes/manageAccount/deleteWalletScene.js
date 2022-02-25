@@ -1,7 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { deleteWallet } = require("../../utils/loadAccount");
-const { replyMenu } = require("../../utils/replyWithMenu");
+const { replyMenu } = require("../../utils/btnMenuHelpers");
 
 /*
 Steps: 

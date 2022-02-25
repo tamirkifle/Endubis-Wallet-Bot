@@ -1,6 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { generateSeedHandler } = require("../handlers/generateSeedHandler");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
+const { mainMenuButton } = require("../utils/btnMenuHelpers");
 
 /*
 Step 1: 
@@ -15,7 +16,7 @@ Write the mnemonic phrase down and keep it safe from prying eyes, you will need 
 <b>Don’t copy it to your clipboard or save it anywhere online.</b>`,
     Markup.inlineKeyboard([
       [Markup.button.callback("Show seed phrase", "generate-seed")],
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
+      [mainMenuButton()],
     ])
   );
   return ctx.wizard.next();
@@ -48,7 +49,7 @@ step2.use((ctx) => {
     "Invalid Entry. Please select from one of the buttons below",
     Markup.inlineKeyboard([
       [Markup.button.callback("Show seed phrase", "generate-seed")],
-      [Markup.button.callback("Back to Main Menu", "back-to-menu")],
+      [mainMenuButton()],
     ])
   );
   return;

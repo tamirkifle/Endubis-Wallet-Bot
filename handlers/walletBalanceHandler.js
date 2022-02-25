@@ -1,23 +1,14 @@
 const { Markup } = require("telegraf");
+const { replyMenu } = require("../utils/btnMenuHelpers");
 const { formatWalletData, getWalletById } = require("../utils/loadAccount");
 
 const walletBalanceHandler = async (ctx) => {
   console.log(`getWalletById: ${getWalletById}`);
   if (ctx.session && ctx.session.loggedInWalletId) {
     const wallet = await getWalletById(ctx.session.loggedInWalletId);
-    ctx.reply(
-      formatWalletData(wallet),
-      Markup.inlineKeyboard([
-        [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-      ])
-    );
+    replyMenu(ctx, formatWalletData(wallet));
   } else {
-    ctx.replyWithMarkdownV2(
-      `No wallet associated!`,
-      Markup.inlineKeyboard([
-        [Markup.button.callback("Back to Main Menu", "back-to-menu")],
-      ])
-    );
+    replyMenu(ctx, `No wallet associated!`);
     return;
   }
 };
