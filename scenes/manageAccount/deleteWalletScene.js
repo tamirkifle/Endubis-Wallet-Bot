@@ -33,7 +33,7 @@ Step 2:
 */
 const step2 = new Composer();
 step2.hears("✅ Yes", async (ctx) => {
-  ctx.reply("Deleting Wallet...");
+  ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
   try {
     const result = await deleteWallet(ctx.session?.loggedInWalletId);
     ctx.session.loggedInWalletId = null;
@@ -46,7 +46,9 @@ step2.hears("✅ Yes", async (ctx) => {
   }
   return ctx.scene.leave();
 });
-step2.hears("❌ No", (ctx) => {
+step2.hears("❌ No", async (ctx) => {
+  await ctx.reply("Aborting...", Markup.removeKeyboard());
+
   return mainMenuHandler(ctx);
 });
 
