@@ -10,14 +10,12 @@ const mainMenuHandler = (ctx) => {
     const userId =
       ctx.update?.message?.from?.id ?? ctx.update?.callback_query?.from?.id;
 
-    if (ctx.update.message?.text === "/start") {
-      ctx.replyWithMarkdownV2(
-        `👋 Welcome back to your wallet, [${userFirstName}](tg://user?id=${userId})`
-      );
-    }
-
-    ctx.replyWithMarkdownV2(
-      `Please choose an option, [${userFirstName}](tg://user?id=${userId})`,
+    ctx.replyWithHTML(
+      `${
+        ctx.update.message?.text === "/start"
+          ? `👋 Welcome back to your wallet\n\n`
+          : ""
+      }Please choose an option, <a href="tg://user?id=${userId}">${userFirstName}</a>`,
       Markup.inlineKeyboard([
         [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
         [Markup.button.callback(" ⚙️ Manage Account", "manage-account")],
@@ -25,8 +23,8 @@ const mainMenuHandler = (ctx) => {
       ])
     );
   } else {
-    ctx.replyWithMarkdownV2(
-      `Please *CREATE* or *RESTORE* a wallet to get started`,
+    ctx.replyWithHTML(
+      `Please <b>CREATE</b> or <b>RESTORE</b> a wallet to get started`,
       Markup.inlineKeyboard([
         [Markup.button.callback("🆕 Create a New Wallet", "create-wallet")],
         [Markup.button.callback("🗝 Restore a Wallet", "restore-wallet")],

@@ -1,7 +1,6 @@
 const { Scenes, Markup, Composer } = require("telegraf");
-const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { changePassphrase } = require("../../utils/loadAccount");
-const { replyMenu, replyMenuMDV2 } = require("../../utils/btnMenuHelpers");
+const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 
 /*
 Steps: 
@@ -89,7 +88,6 @@ step4.on("text", async (ctx) => {
     );
     return ctx.wizard.selectStep(2);
   }
-  ctx.reply("Changing your passphrase...");
   try {
     const result = await changePassphrase(
       ctx.session?.loggedInWalletId,
@@ -98,11 +96,11 @@ step4.on("text", async (ctx) => {
     );
     replyMenu(ctx, "Passphrase was successfully changed");
   } catch (e) {
-    replyMenuMDV2(
+    replyMenuHTML(
       ctx,
-      `🔴 *ERROR* \n\n${
+      `🔴 <b>ERROR</b> \n\n${
         e.response.data.code === "wrong_encryption_passphrase"
-          ? "*Wrong Passphrase*\n\nIf you have forgotten your old passphrase, \nplease _*delete your account*_ and restore it again \nto set a new passphrase"
+          ? "<b>Wrong Passphrase</b>\n\nIf you have forgotten your old passphrase, \nplease <i>delete your account</i> and restore it again \nto set a new passphrase"
           : e.response.data.message
       }`
     );

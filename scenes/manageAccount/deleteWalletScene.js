@@ -17,8 +17,8 @@ Step 1:
 */
 
 const step1 = (ctx) => {
-  ctx.replyWithMarkdownV2(
-    `Are you sure you want to *delete* this wallet from our database\\.\n The wallet will still be available on the blockchain`,
+  ctx.replyWithHTML(
+    `Are you sure you want to <b>delete</b> this wallet from our database.\n The wallet will still be available on the blockchain`,
     Markup.keyboard([["✅ Yes"], ["❌ No"]])
       .oneTime()
       .resize()

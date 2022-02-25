@@ -13,7 +13,7 @@ Step 1:
 */
 
 const step1 = (ctx) => {
-  ctx.replyWithMarkdownV2(
+  ctx.reply(
     `Please choose an option below to manage your account`,
     Markup.inlineKeyboard([
       [Markup.button.callback("Change Passphrase", "change-passphrase")],
