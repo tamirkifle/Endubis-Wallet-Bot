@@ -13,6 +13,9 @@ const {
 } = require("./scenes/manageAccount/deleteWalletScene");
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
+const {
+  changeWalletNameScene,
+} = require("./scenes/manageAccount/changeWalletNameScene");
 
 require("dotenv").config();
 
@@ -29,7 +32,9 @@ const stage = new Scenes.Stage([
   manageAccountScene,
   changePassphraseScene,
   deleteWalletScene,
+  changeWalletNameScene,
 ]);
+
 bot.use(
   new LocalSession({
     database: "wallet_bot_db",

@@ -40,6 +40,7 @@ Step 2:
 const step2 = new Composer();
 step2.action("change-passphrase", Scenes.Stage.enter("changePassphraseScene"));
 step2.action("delete-wallet", Scenes.Stage.enter("deleteWalletScene"));
+step2.action("change-wallet-name", Scenes.Stage.enter("changeWalletNameScene"));
 
 const manageAccountScene = new Scenes.WizardScene(
   "manageAccountScene",
