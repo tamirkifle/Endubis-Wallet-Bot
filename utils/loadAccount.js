@@ -39,8 +39,7 @@ const getWalletByName = async (walletName) => {
 };
 
 const formatWalletData = (wallet) => {
-  console.log(wallet);
-  return `Here's your wallet information: 
+  return `Hey there. Here's your wallet information:
 
 Wallet Name: ${wallet.name}
 Wallet Total Balance: ${wallet.balance.total.quantity / 1000000} ADA
@@ -50,7 +49,6 @@ Wallet Available Balance: ${wallet.balance.available.quantity / 1000000} ADA
 
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
-  // console.log(wallets.map((w) => w.balance.total.quantity / 1000000));
   return wallets;
 };
 
@@ -75,6 +73,10 @@ const deleteWallet = async (walletId) => {
   const result = await wallet.delete();
   return result;
 };
+
+const walletServerInfo = async () => {
+  return walletServer.getNetworkInformation();
+};
 //account-1
 // loadAccountFromSeed(
 //   "celery trumpet decade draft naive nature antique novel topple slice celery gas fossil transfer wash",
@@ -89,9 +91,7 @@ const deleteWallet = async (walletId) => {
 //   "tamir-test-wallet"
 // );
 
-(async function () {
-  listWallets();
-})();
+(async function () {})();
 
 module.exports = {
   loadAccountFromSeed,
@@ -99,5 +99,5 @@ module.exports = {
   getWalletById,
   changePassphrase,
   deleteWallet,
-  getAddresses,
+  walletServerInfo,
 };
