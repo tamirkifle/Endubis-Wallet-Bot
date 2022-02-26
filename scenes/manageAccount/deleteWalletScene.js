@@ -18,7 +18,7 @@ Step 1:
 
 const step1 = (ctx) => {
   ctx.replyWithHTML(
-    `Are you sure you want to <b>delete</b> this wallet from our database.\n The wallet will still be available on the blockchain`,
+    `Are you sure you want to <b>delete</b> this wallet from our database.\nThe wallet will still be available on the blockchain`,
     Markup.keyboard([["✅ Yes"], ["❌ No"]])
       .oneTime()
       .resize()
@@ -33,7 +33,7 @@ Step 2:
 */
 const step2 = new Composer();
 step2.hears("✅ Yes", async (ctx) => {
-  ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
+  await ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
   try {
     const result = await deleteWallet(ctx.session?.loggedInWalletId);
     ctx.session.loggedInWalletId = null;

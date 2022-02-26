@@ -10,7 +10,7 @@ const mainMenuHandler = (ctx) => {
     const userId =
       ctx.update?.message?.from?.id ?? ctx.update?.callback_query?.from?.id;
 
-    ctx.replyWithHTML(
+    return ctx.replyWithHTML(
       `${
         ctx.update.message?.text === "/start"
           ? `👋 Welcome back to your wallet\n\n`
@@ -23,7 +23,7 @@ const mainMenuHandler = (ctx) => {
       ])
     );
   } else {
-    ctx.replyWithHTML(
+    return ctx.replyWithHTML(
       `Please <b>CREATE</b> or <b>RESTORE</b> a wallet to get started`,
       Markup.inlineKeyboard([
         [Markup.button.callback("🆕 Create a New Wallet", "create-wallet")],

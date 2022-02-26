@@ -12,22 +12,28 @@ Step 1:
   - Change default address
 */
 
-const step1 = (ctx) => {
-  ctx.reply(
-    `Please choose an option below to manage your account`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("Change Passphrase", "change-passphrase")],
-      [Markup.button.callback("Change Wallet Name", "change-wallet-name")],
-      [Markup.button.callback("Delete Account", "delete-wallet")],
-      [mainMenuButton()],
-    ])
-  );
-  return ctx.wizard.next();
+const step1 = async (ctx) => {
+  if (!ctx.session?.loggedInWalletId) {
+    mainMenuHandler(ctx);
+  } else {
+    ctx.reply(
+      `Please choose an option below to manage your account`,
+      Markup.inlineKeyboard([
+        [Markup.button.callback("Change Passphrase", "change-passphrase")],
+        [Markup.button.callback("Change Wallet Name", "change-wallet-name")],
+        [Markup.button.callback("Delete Account", "delete-wallet")],
+        [mainMenuButton()],
+      ])
+    );
+    return ctx.wizard.next();
+  }
 };
 
 /*
 Step 2: 
-- Enter Change Passphrase Scene when Change passphrase is selected
+- Enter changePassphraseScene when Change passphrase is selected
+- Enter deleteWalletScene when Delete Wallet is selected
+- Enter changeWalletNameScene when Change Wallet Name is selected
 
 */
 
