@@ -1,5 +1,6 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
+const { walletBalanceHandler } = require("../handlers/walletBalanceHandler");
 const { replyMenu } = require("../utils/btnMenuHelpers");
 const {
   loadAccountFromSeed,
@@ -79,9 +80,9 @@ step4.on("text", async (ctx) => {
   const { seedPhrases, walletName, passphrase } = ctx.scene.state;
   const wallet = await loadAccountFromSeed(seedPhrases, passphrase, walletName);
   ctx.session.loggedInWalletId = wallet.id;
+  walletBalanceHandler(ctx);
   //TODO: handle thrown errors
   //TODO: Handle Exisitng Wallets
-  replyMenu(ctx, formatWalletData(wallet));
   return ctx.scene.leave();
 });
 
