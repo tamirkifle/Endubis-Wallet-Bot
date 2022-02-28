@@ -49,11 +49,14 @@ Wallet Available Balance: ${wallet.balance.available.quantity / 1000000} ADA
 
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
+  // const mywallet = await getWalletByName("tamirk");
+  // console.log((await mywallet.getUnusedAddresses()).slice(0, 1));
   return wallets;
 };
 
 const getAddresses = async (wallet) => {
   const addresses = await wallet.getAddresses();
+
   return addresses;
 };
 
@@ -91,7 +94,9 @@ const walletServerInfo = async () => {
 //   "tamir-test-wallet"
 // );
 
-(async function () {})();
+(function () {
+  listWallets();
+})();
 
 module.exports = {
   loadAccountFromSeed,

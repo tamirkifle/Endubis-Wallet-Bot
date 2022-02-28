@@ -4,6 +4,7 @@ const CryptoJS = require("crypto-js");
 
 const { createAccountScene } = require("./scenes/createAccountScene");
 const { restoreAccountScene } = require("./scenes/restoreAccountScene");
+const { receiveScene } = require("./scenes/receiveScene");
 const { manageAccountScene } = require("./scenes/manageAccountScene");
 const {
   changePassphraseScene,
@@ -17,6 +18,7 @@ const {
   changeWalletNameScene,
 } = require("./scenes/manageAccount/changeWalletNameScene");
 const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
+const { mainMenuButton } = require("./utils/btnMenuHelpers");
 
 require("dotenv").config();
 
@@ -30,6 +32,7 @@ const bot = new Telegraf(token);
 const stage = new Scenes.Stage([
   createAccountScene,
   restoreAccountScene,
+  receiveScene,
   viewTransactionsScene,
   manageAccountScene,
   changePassphraseScene,
@@ -64,6 +67,7 @@ bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action("wallet-balance", walletBalanceHandler);
+bot.action("receive", Scenes.Stage.enter("receiveScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", (ctx) => {
