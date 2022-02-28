@@ -5,7 +5,7 @@ const generateSeedHandler = (ctx) => {
   const seedPhrases = generateSeed();
   const replyWithSeedPhrases =
     "Here's your seed phrase, keep it safe: \n" + seedPhrases;
-  ctx.replyWithHTML(
+  ctx.replyWithMarkdownV2(
     replyWithSeedPhrases,
     Markup.inlineKeyboard([
       Markup.button.callback("Delete and Continue", "delete-then-restore"),
