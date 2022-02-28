@@ -16,6 +16,7 @@ const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 const {
   changeWalletNameScene,
 } = require("./scenes/manageAccount/changeWalletNameScene");
+const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
 
 require("dotenv").config();
 
@@ -29,6 +30,7 @@ const bot = new Telegraf(token);
 const stage = new Scenes.Stage([
   createAccountScene,
   restoreAccountScene,
+  viewTransactionsScene,
   manageAccountScene,
   changePassphraseScene,
   deleteWalletScene,
@@ -63,6 +65,7 @@ bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action("wallet-balance", walletBalanceHandler);
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
+bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", (ctx) => {
   ctx.session.loggedInWalletId = null;
   ctx.deleteMessage();

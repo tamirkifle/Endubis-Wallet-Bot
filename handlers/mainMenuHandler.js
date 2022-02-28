@@ -18,6 +18,7 @@ const mainMenuHandler = (ctx) => {
       }Please choose an option, <a href="tg://user?id=${userId}">${userFirstName}</a>`,
       Markup.inlineKeyboard([
         [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
+        [Markup.button.callback("📒 Transaction History", "view-transactions")],
         [Markup.button.callback(" ⚙️ Manage Account", "manage-account")],
         [Markup.button.callback("🚪 Logout", "log-out")],
       ])
