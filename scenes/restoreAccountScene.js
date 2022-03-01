@@ -67,7 +67,7 @@ step3.on("text", async (ctx) => {
     String(ctx.from.id)
   );
   ctx.session.loggedInWalletId = wallet.id;
-  await ctx.reply(`Weclcome to your account, ${ctx.from.first_name}`);
+  await ctx.reply(`Weclcome to your account\n`);
   mainMenuHandler(ctx);
   return ctx.scene.leave();
 });
