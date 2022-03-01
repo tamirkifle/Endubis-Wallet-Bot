@@ -38,18 +38,8 @@ const getWalletByName = async (walletName) => {
   return foundWallet;
 };
 
-const formatWalletData = (wallet) => {
-  return `Hey there. Here's your wallet information:
-
-Wallet Total Balance: ${wallet.balance.total.quantity / 1000000} ADA
-Wallet Available Balance: ${wallet.balance.available.quantity / 1000000} ADA
-`;
-};
-
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
-  // const mywallet = await getWalletByName("tamirk");
-  // console.log((await mywallet.getUnusedAddresses()).slice(0, 1));
   return wallets;
 };
 
@@ -99,7 +89,6 @@ const walletServerInfo = async () => {
 
 module.exports = {
   loadAccountFromSeed,
-  formatWalletData,
   getWalletById,
   changePassphrase,
   deleteWallet,

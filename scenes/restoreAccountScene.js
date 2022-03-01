@@ -2,10 +2,7 @@ const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("../handlers/walletBalanceHandler");
 const { replyMenu } = require("../utils/btnMenuHelpers");
-const {
-  loadAccountFromSeed,
-  formatWalletData,
-} = require("../utils/loadAccount");
+const { loadAccountFromSeed } = require("../utils/loadAccount");
 
 /*
 Step 1: 

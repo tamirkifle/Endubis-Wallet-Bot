@@ -1,11 +1,19 @@
 const { Markup } = require("telegraf");
-const { replyMenu, mainMenuButton } = require("../utils/btnMenuHelpers");
-const {
-  formatWalletData,
-  getWalletById,
-  walletServerInfo,
-} = require("../utils/loadAccount");
+const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
+const { getWalletById } = require("../utils/loadAccount");
 const { mainMenuHandler } = require("./mainMenuHandler");
+
+const formatWalletData = (wallet, name) => {
+  return `Here's your wallet information, ${name}:
+
+Wallet Total Balance: <tg-spoiler>${
+    wallet.balance.total.quantity / 1000000
+  } ada</tg-spoiler>
+Wallet Available Balance: <tg-spoiler>${
+    wallet.balance.available.quantity / 1000000
+  } ada</tg-spoiler>
+`;
+};
 
 const walletBalanceHandler = async (ctx) => {
   if (!ctx.session?.loggedInWalletId) {
@@ -16,7 +24,6 @@ const walletBalanceHandler = async (ctx) => {
     await ctx.reply(
       `Hey there. Your wallet is syncing. Please Wait...
         
-Wallet Name: ${wallet.name}
 Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
       Markup.inlineKeyboard([
         [Markup.button.callback("Refresh", "wallet-balance")],
@@ -24,7 +31,7 @@ Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
       ])
     );
   } else {
-    replyMenu(ctx, formatWalletData(wallet));
+    replyMenuHTML(ctx, formatWalletData(wallet, ctx.from.first_name));
   }
 };
 
