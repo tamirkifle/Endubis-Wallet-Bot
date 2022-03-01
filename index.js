@@ -19,6 +19,8 @@ const {
 } = require("./scenes/manageAccount/changeWalletNameScene");
 const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
 const { mainMenuButton } = require("./utils/btnMenuHelpers");
+const { sendScene } = require("./scenes/sendScene");
+const { sendToAddressScene } = require("./scenes/send/sendToAddressScene");
 
 require("dotenv").config();
 
@@ -33,11 +35,13 @@ const stage = new Scenes.Stage([
   createAccountScene,
   restoreAccountScene,
   receiveScene,
+  sendScene,
   viewTransactionsScene,
   manageAccountScene,
   changePassphraseScene,
   deleteWalletScene,
   changeWalletNameScene,
+  sendToAddressScene,
 ]);
 
 bot.use(
@@ -68,6 +72,7 @@ bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action("wallet-balance", walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
+bot.action("send", Scenes.Stage.enter("sendScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", (ctx) => {
