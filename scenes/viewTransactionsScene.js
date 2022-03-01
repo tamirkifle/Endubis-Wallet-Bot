@@ -84,7 +84,18 @@ ID: ${txn.id}
 Amount: ${txn.amount.quantity / 1000000} ada
 Direction: ${txn.direction.toUpperCase()}
 Fee: ${txn.fee.quantity / 1000000} ada 
-Status: ${txn.status.toUpperCase()}`,
+Status: ${txn.status.toUpperCase()}
+${
+  txn.inserted_at
+    ? `Inserted at: ${String(new Date(txn.inserted_at.time))}`
+    : ""
+}
+${txn.expires_at ? `Expires at: ${String(new Date(txn.expires_at.time))}` : ""}
+${
+  txn.pending_since
+    ? `Pending Since: ${String(new Date(txn.inserted_at.time))}`
+    : ""
+}`,
       customInlineKeyboard(index, txn.id)
     );
   }
