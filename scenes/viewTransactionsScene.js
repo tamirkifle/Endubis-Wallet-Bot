@@ -86,14 +86,18 @@ Direction: ${txn.direction.toUpperCase()}
 Fee: ${txn.fee.quantity / 1000000} ada 
 Status: ${txn.status.toUpperCase()}
 ${
-  txn.inserted_at
+  txn.inserted_at?.time
     ? `Inserted at: ${String(new Date(txn.inserted_at.time))}`
     : ""
 }
-${txn.expires_at ? `Expires at: ${String(new Date(txn.expires_at.time))}` : ""}
 ${
-  txn.pending_since
-    ? `Pending Since: ${String(new Date(txn.inserted_at.time))}`
+  txn.expires_at?.time
+    ? `Expires at: ${String(new Date(txn.expires_at.time))}`
+    : ""
+}
+${
+  txn.pending_since?.time
+    ? `Pending Since: ${String(new Date(txn.pending_since.time))}`
     : ""
 }`,
       customInlineKeyboard(index, txn.id)

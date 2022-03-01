@@ -19,6 +19,7 @@ const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
 const { mainMenuButton } = require("./utils/btnMenuHelpers");
 const { sendScene } = require("./scenes/sendScene");
 const { sendToAddressScene } = require("./scenes/send/sendToAddressScene");
+const { sendToTelegramScene } = require("./scenes/send/sendToTelegramScene");
 
 require("dotenv").config();
 
@@ -40,6 +41,7 @@ const stage = new Scenes.Stage([
   changePassphraseScene,
   deleteWalletScene,
   sendToAddressScene,
+  sendToTelegramScene,
 ]);
 
 bot.use(
@@ -88,4 +90,10 @@ bot.action("delete-then-restore", (ctx) => {
   ctx.deleteMessage();
 });
 
+const getChat = (chat_id) => {
+  return bot.telegram.getChat(chat_id);
+};
+
 bot.launch();
+
+module.exports = { getChat };

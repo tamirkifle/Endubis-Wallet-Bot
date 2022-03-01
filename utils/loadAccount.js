@@ -93,4 +93,6 @@ module.exports = {
   changePassphrase,
   deleteWallet,
   walletServerInfo,
+  listWallets,
+  getWalletByName,
 };

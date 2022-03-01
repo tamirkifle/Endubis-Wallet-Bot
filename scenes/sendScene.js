@@ -11,12 +11,7 @@ const step1 = (ctx) => {
     "Please choose an option from the choices below",
     Markup.inlineKeyboard([
       [Markup.button.callback("Send to a Cardano address", "send-addr")],
-      [
-        Markup.button.callback(
-          "IN CONSTRUCTION: Send to a Telegram user",
-          "send-tg-user"
-        ),
-      ],
+      [Markup.button.callback("Send to a Telegram user", "send-tg-user")],
       [
         Markup.button.callback(
           "IN CONSTRUCTION: Send using a QR Code",
@@ -36,6 +31,7 @@ const step1 = (ctx) => {
 
 const step2 = new Composer();
 step2.action("send-addr", Scenes.Stage.enter("sendToAddressScene"));
+step2.action("send-tg-user", Scenes.Stage.enter("sendToTelegramScene"));
 
 const sendScene = new Scenes.WizardScene("sendScene", step1, step2);
 
