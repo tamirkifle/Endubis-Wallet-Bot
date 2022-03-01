@@ -52,37 +52,26 @@ step2.use((ctx) => {
   Step 3
   - Validate passphrase
   - Save passphrase in local state
-  - Ask user for wallet name
+  - Set Wallet Name to the user_id (ctx.from.id)
+  - Load wallet
   */
 
 const step3 = new Composer();
 
-step3.on("text", (ctx) => {
+step3.on("text", async (ctx) => {
   if (ctx.message.text.length < 10) {
     replyMenu(ctx, `Passphrase must be at least 10 characters long. Try again`);
     return;
   }
-  ctx.scene.state.passphrase = ctx.message.text;
-  replyMenu(ctx, `Please enter a name for this wallet`);
-  return ctx.wizard.next();
-});
-
-/* 
-  Step 4
-  - Validate Wallet Name if there are any reqts.
-  - Load wallet from data in local state
-  */
-
-const step4 = new Composer();
-
-step4.on("text", async (ctx) => {
-  ctx.scene.state.walletName = ctx.message.text;
-  const { seedPhrases, walletName, passphrase } = ctx.scene.state;
-  const wallet = await loadAccountFromSeed(seedPhrases, passphrase, walletName);
+  const passphrase = ctx.message.text;
+  const wallet = await loadAccountFromSeed(
+    ctx.scene.state.seedPhrases,
+    passphrase,
+    String(ctx.from.id)
+  );
   ctx.session.loggedInWalletId = wallet.id;
-  walletBalanceHandler(ctx);
-  //TODO: handle thrown errors
-  //TODO: Handle Exisitng Wallets
+  await ctx.reply(`Weclcome to your account, ${ctx.from.first_name}`);
+  mainMenuHandler(ctx);
   return ctx.scene.leave();
 });
 
@@ -90,8 +79,7 @@ const restoreAccountScene = new Scenes.WizardScene(
   "restoreAccountScene",
   (ctx) => step1(ctx),
   step2,
-  step3,
-  step4
+  step3
 );
 
 module.exports = { restoreAccountScene };

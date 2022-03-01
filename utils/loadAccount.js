@@ -41,7 +41,6 @@ const getWalletByName = async (walletName) => {
 const formatWalletData = (wallet) => {
   return `Hey there. Here's your wallet information:
 
-Wallet Name: ${wallet.name}
 Wallet Total Balance: ${wallet.balance.total.quantity / 1000000} ADA
 Wallet Available Balance: ${wallet.balance.available.quantity / 1000000} ADA
 `;

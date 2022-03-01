@@ -1,9 +1,6 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
 const { mainMenuButton } = require("../utils/btnMenuHelpers");
-const {
-  changePassphraseScene,
-} = require("./manageAccount/changePassphraseScene");
 /*
 Step 1: 
 - Show Manage Account Menu
@@ -20,7 +17,6 @@ const step1 = async (ctx) => {
       `Please choose an option below to manage your account`,
       Markup.inlineKeyboard([
         [Markup.button.callback("Change Passphrase", "change-passphrase")],
-        [Markup.button.callback("Change Wallet Name", "change-wallet-name")],
         [Markup.button.callback("Delete Account", "delete-wallet")],
         [mainMenuButton()],
       ])
@@ -40,7 +36,6 @@ Step 2:
 const step2 = new Composer();
 step2.action("change-passphrase", Scenes.Stage.enter("changePassphraseScene"));
 step2.action("delete-wallet", Scenes.Stage.enter("deleteWalletScene"));
-step2.action("change-wallet-name", Scenes.Stage.enter("changeWalletNameScene"));
 
 const manageAccountScene = new Scenes.WizardScene(
   "manageAccountScene",

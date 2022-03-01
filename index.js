@@ -15,9 +15,6 @@ const {
 } = require("./scenes/manageAccount/deleteWalletScene");
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
-const {
-  changeWalletNameScene,
-} = require("./scenes/manageAccount/changeWalletNameScene");
 const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
 const { mainMenuButton } = require("./utils/btnMenuHelpers");
 const { sendScene } = require("./scenes/sendScene");
@@ -42,7 +39,6 @@ const stage = new Scenes.Stage([
   manageAccountScene,
   changePassphraseScene,
   deleteWalletScene,
-  changeWalletNameScene,
   sendToAddressScene,
 ]);
 
