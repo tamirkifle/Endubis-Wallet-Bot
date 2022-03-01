@@ -60,7 +60,8 @@ const txnListHandler = async (ctx, monthsOfTxns) => {
       [Markup.button.callback("More Details", "more-details")],
     ]);
   };
-  txns.forEach(async (txn, index) => {
+
+  for (const [index, txn] of txns.entries()) {
     await ctx.reply(
       `${
         index === 0
@@ -68,7 +69,7 @@ const txnListHandler = async (ctx, monthsOfTxns) => {
           : ""
       }
   
-Transaction #${index + 1}
+Transaction #${txns.length - index}
 ID: ${txn.id}
 Amount: ${txn.amount.quantity / 1000000} ada
 Direction: ${txn.direction.toUpperCase()}
@@ -76,7 +77,7 @@ Fee: ${txn.fee.quantity / 1000000} ada
 Status: ${txn.status.toUpperCase()}`,
       customInlineKeyboard(index)
     );
-  });
+  }
   return;
 };
 
