@@ -19,8 +19,8 @@ const mainMenuHandler = (ctx) => {
       Markup.inlineKeyboard([
         [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
         [
-          Markup.button.callback("⤵️ Receive", "receive"),
-          Markup.button.callback("⤴️ Send", "send"),
+          Markup.button.callback("📩 Receive", "receive"),
+          Markup.button.callback("💸 Send", "send"),
         ],
         [Markup.button.callback("📒 Transaction History", "view-transactions")],
         [Markup.button.callback(" ⚙️ Manage Account", "manage-account")],
