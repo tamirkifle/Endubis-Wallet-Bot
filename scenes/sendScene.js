@@ -10,9 +10,19 @@ const step1 = (ctx) => {
   ctx.reply(
     "Please choose an option from the choices below",
     Markup.inlineKeyboard([
-      [Markup.button.callback("Send to a Telegram user", "send-tg-user")],
       [Markup.button.callback("Send to a Cardano address", "send-addr")],
-      [Markup.button.callback("Send using a QR Code", "send-qr-code")],
+      [
+        Markup.button.callback(
+          "IN CONSTRUCTION: Send to a Telegram user",
+          "send-tg-user"
+        ),
+      ],
+      [
+        Markup.button.callback(
+          "IN CONSTRUCTION: Send using a QR Code",
+          "send-qr-code"
+        ),
+      ],
       [mainMenuButton()],
     ])
   );
