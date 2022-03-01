@@ -1,6 +1,7 @@
 const { Telegraf, Markup, Scenes } = require("telegraf");
 const LocalSession = require("telegraf-session-local");
 const CryptoJS = require("crypto-js");
+const { telegrafThrottler } = require("telegraf-throttler");
 
 const { createAccountScene } = require("./scenes/createAccountScene");
 const { restoreAccountScene } = require("./scenes/restoreAccountScene");
@@ -30,7 +31,8 @@ if (token === undefined) {
 }
 
 const bot = new Telegraf(token);
-
+const throttler = telegrafThrottler();
+bot.use(throttler);
 const stage = new Scenes.Stage([
   createAccountScene,
   restoreAccountScene,
