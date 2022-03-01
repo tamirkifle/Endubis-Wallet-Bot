@@ -49,15 +49,25 @@ const txnListHandler = async (ctx, monthsOfTxns) => {
   const txns = monthsOfTxns
     ? await wallet.getTransactions(startDate, endDate)
     : await wallet.getTransactions();
-  const customInlineKeyboard = (index) => {
+  const customInlineKeyboard = (index, txnId) => {
     if (index === txns.length - 1) {
       return Markup.inlineKeyboard([
-        [Markup.button.callback("More Details", "more-details")],
+        [
+          Markup.button.url(
+            "More Details",
+            `https://testnet.cardanoscan.io/transaction/${txnId}`
+          ),
+        ],
         [mainMenuButton()],
       ]);
     }
     return Markup.inlineKeyboard([
-      [Markup.button.callback("More Details", "more-details")],
+      [
+        Markup.button.url(
+          "More Details",
+          `https://testnet.cardanoscan.io/transaction/${txnId}`
+        ),
+      ],
     ]);
   };
 
@@ -75,7 +85,7 @@ Amount: ${txn.amount.quantity / 1000000} ada
 Direction: ${txn.direction.toUpperCase()}
 Fee: ${txn.fee.quantity / 1000000} ada 
 Status: ${txn.status.toUpperCase()}`,
-      customInlineKeyboard(index)
+      customInlineKeyboard(index, txn.id)
     );
   }
   return;
