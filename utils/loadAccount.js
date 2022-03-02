@@ -13,8 +13,16 @@ const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
 };
 
 const getWalletById = async (walletId) => {
-  const wallet = walletServer.getShelleyWallet(walletId);
-  return wallet;
+  try {
+    const wallet = await walletServer.getShelleyWallet(walletId);
+    return wallet;
+  } catch (e) {
+    if (e.response.data.code === "no_such_wallet") {
+      return null;
+    } else {
+      throw e;
+    }
+  }
 };
 
 const getWalletByName = async (walletName) => {
