@@ -21,6 +21,7 @@ const walletBalanceHandler = async (ctx) => {
   }
   const wallet = await getWalletById(ctx.session.loggedInWalletId);
   if (wallet.state.status !== "ready") {
+    await ctx.deleteMessage();
     await ctx.reply(
       `Hey there. Your wallet is syncing. Please Wait...
         
