@@ -6,6 +6,8 @@ const {
   mainMenuButton,
   replyMenuMDV2,
 } = require("../../utils/btnMenuHelpers");
+const { formatTxnData } = require("../../utils/formatTxnData");
+
 const { AddressWallet } = require("cardano-wallet-js");
 /* 
 Step 1
@@ -66,7 +68,7 @@ Est. Fees: ${estimatedFees.estimated_min.quantity / 1000000} ada - ${
         } ada`,
         Markup.inlineKeyboard([
           [Markup.button.callback("Send", "send-txn")],
-          [mainMenuButton()],
+          [mainMenuButton("Cancel")],
         ])
       );
     }
@@ -95,31 +97,26 @@ step4.action("send-txn", async (ctx) => {
 Step 5
 - Submit Transaction
 */
-
+let transaction;
 const step5 = new Composer();
 step5.on("text", async (ctx) => {
   const passphrase = ctx.update.message?.text;
   try {
-    let transaction = await wallet.sendPayment(
+    transaction = await wallet.sendPayment(
       passphrase,
       [receiverAddress],
       [amount]
     );
     ctx.reply(
-      `Transaction Successfully Submitted.
-Transaction Details: 
-Txn ID: ${transaction.id}
-Txn Amount: ${transaction.amount.quantity / 1000000} ada
-Txn Fee: ${transaction.fee.quantity / 1000000} ada
-Submitted at: ${String(new Date(transaction.pending_since.time))}
-Status: ${transaction.status}
-
-`,
+      `Transaction Successfully Submitted.\nTransaction Details:\n${formatTxnData(
+        transaction
+      )}`,
       Markup.inlineKeyboard([
         [Markup.button.callback("Refresh", "refresh-txn")],
         [mainMenuButton()],
       ])
     );
+    return ctx.wizard.next();
   } catch (e) {
     replyMenu(
       ctx,
@@ -129,13 +126,34 @@ Status: ${transaction.status}
   }
 });
 
+const step6 = new Composer();
+step6.action("refresh-txn", async (ctx) => {
+  transaction = await wallet.getTransaction(transaction.id); //refresh txn
+  if (transaction.status === "in_ledger") {
+    await ctx.reply(
+      `Transaction Details:\n${formatTxnData(transaction)}`,
+      Markup.inlineKeyboard([[mainMenuButton()]])
+    );
+    return ctx.scene.leave();
+  }
+  await ctx.reply(
+    `Transaction Details:\n${formatTxnData(transaction)}`,
+    Markup.inlineKeyboard([
+      [Markup.button.callback("Refresh", "refresh-txn")],
+      [mainMenuButton()],
+    ])
+  );
+  return;
+});
+
 const sendToAddressScene = new Scenes.WizardScene(
   "sendToAddressScene",
   step1,
   step2,
   step3,
   step4,
-  step5
+  step5,
+  step6
 );
 
 module.exports = { sendToAddressScene };

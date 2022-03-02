@@ -5,6 +5,7 @@ const {
   replyMenuHTML,
   mainMenuButton,
 } = require("../utils/btnMenuHelpers");
+const { formatTxnData } = require("../utils/formatTxnData");
 
 /* 
 Step 1
@@ -80,26 +81,7 @@ const txnListHandler = async (ctx, monthsOfTxns) => {
       }
   
 Transaction #${txns.length - index}
-ID: ${txn.id}
-Amount: ${txn.amount.quantity / 1000000} ada
-Direction: ${txn.direction.toUpperCase()}
-Fee: ${txn.fee.quantity / 1000000} ada 
-Status: ${txn.status.toUpperCase()}
-${
-  txn.inserted_at?.time
-    ? `Inserted at: ${String(new Date(txn.inserted_at.time))}`
-    : ""
-}
-${
-  txn.expires_at?.time
-    ? `Expires at: ${String(new Date(txn.expires_at.time))}`
-    : ""
-}
-${
-  txn.pending_since?.time
-    ? `Pending Since: ${String(new Date(txn.pending_since.time))}`
-    : ""
-}`,
+${formatTxnData(txn)}`,
       customInlineKeyboard(index, txn.id)
     );
   }
