@@ -4,27 +4,12 @@ let walletServer = WalletServer.init("http://localhost:8090/v2");
 
 const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
   const seedArray = Seed.toMnemonicList(seedPhrases);
-  try {
-    const wallet = await walletServer.createOrRestoreShelleyWallet(
-      walletName,
-      seedArray,
-      passphrase
-    );
-    return wallet;
-  } catch (e) {
-    if (e.response.data.code === "wallet_already_exists") {
-      console.log("Wallet Already Exists");
-
-      //TODO: Find a Better way of getting the walletID from a seed phrase with an already exisiting wallet
-      const existingWalletId = JSON.stringify(e.response.data.message)
-        .split("id: ")[1]
-        .split(" However")[0];
-      const existingWallet = await getWalletById(existingWalletId);
-      return existingWallet;
-    } else {
-      throw e;
-    }
-  }
+  const wallet = await walletServer.createOrRestoreShelleyWallet(
+    walletName,
+    seedArray,
+    passphrase
+  );
+  return wallet;
 };
 
 const getWalletById = async (walletId) => {
@@ -40,6 +25,7 @@ const getWalletByName = async (walletName) => {
 
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
+  console.log(wallets.map((w) => w.id));
   return wallets;
 };
 
@@ -82,8 +68,17 @@ const walletServerInfo = async () => {
 //   "passwordistamir",
 //   "tamir-test-wallet"
 // );
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 
-(function () {
+const idFromSeed = async (seedPhrases) => {
+  const { stdout, stderr } = await exec(
+    `cd ~/Downloads/cardano-wallet-v2022-01-18-macos64; echo "${seedPhrases}" | ./cardano-address key from-recovery-phrase Shelley | ./cardano-address key public --with-chain-code | ./bech32 | xxd -r -p | b2sum -l 160 | cut -d' ' -f1`
+  );
+  return stdout.trim();
+};
+
+(async function () {
   listWallets();
 })();
 
@@ -95,4 +90,5 @@ module.exports = {
   walletServerInfo,
   listWallets,
   getWalletByName,
+  idFromSeed,
 };

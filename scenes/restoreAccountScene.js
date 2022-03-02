@@ -2,7 +2,11 @@ const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("../handlers/walletBalanceHandler");
 const { replyMenu, replyMenuHTML } = require("../utils/btnMenuHelpers");
-const { loadAccountFromSeed } = require("../utils/loadAccount");
+const {
+  loadAccountFromSeed,
+  idFromSeed,
+  getWalletById,
+} = require("../utils/loadAccount");
 
 /*
 Step 1: 
@@ -23,13 +27,20 @@ Step 2:
 */
 const step2 = new Composer();
 
-step2.on("text", (ctx) => {
+step2.on("text", async (ctx) => {
   //TODO: Validate the seed phrase
   if (ctx.message.text.trim().split(" ").length < 15) {
     replyMenu(ctx, "That doesn't seem like a valid seed phrase. Try Again");
     return;
   }
   ctx.scene.state.seedPhrases = ctx.message.text.toLowerCase();
+  const id = await idFromSeed(ctx.scene.state.seedPhrases);
+  const existingWallet = await getWalletById(id);
+  if (existingWallet) {
+    await ctx.reply("Wallet already exists in database. Loading the wallet.");
+    ctx.session.loggedInWalletId = id;
+    return mainMenuHandler(ctx);
+  }
   replyMenu(
     ctx,
     `Please enter a passphrase to secure you account (10 characters or more)`
