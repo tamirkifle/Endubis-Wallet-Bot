@@ -1,7 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("../handlers/walletBalanceHandler");
-const { replyMenu } = require("../utils/btnMenuHelpers");
+const { replyMenu, replyMenuHTML } = require("../utils/btnMenuHelpers");
 const { loadAccountFromSeed } = require("../utils/loadAccount");
 
 /*
@@ -29,7 +29,7 @@ step2.on("text", (ctx) => {
     replyMenu(ctx, "That doesn't seem like a valid seed phrase. Try Again");
     return;
   }
-  ctx.scene.state.seedPhrases = ctx.message.text;
+  ctx.scene.state.seedPhrases = ctx.message.text.toLowerCase();
   replyMenu(
     ctx,
     `Please enter a passphrase to secure you account (10 characters or more)`
@@ -61,14 +61,18 @@ step3.on("text", async (ctx) => {
     return;
   }
   const passphrase = ctx.message.text;
-  const wallet = await loadAccountFromSeed(
-    ctx.scene.state.seedPhrases,
-    passphrase,
-    String(ctx.from.id)
-  );
-  ctx.session.loggedInWalletId = wallet.id;
-  await ctx.reply(`Weclcome to your account\n`);
-  mainMenuHandler(ctx);
+  try {
+    const wallet = await loadAccountFromSeed(
+      ctx.scene.state.seedPhrases,
+      passphrase,
+      String(ctx.from.id)
+    );
+    ctx.session.loggedInWalletId = wallet.id;
+    await ctx.reply(`Weclcome to your account\n`);
+    mainMenuHandler(ctx);
+  } catch (e) {
+    replyMenuHTML(ctx, `🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
+  }
   return ctx.scene.leave();
 });
 
