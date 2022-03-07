@@ -21,13 +21,20 @@ const walletBalanceHandler = async (ctx) => {
   }
   const wallet = await getWalletById(ctx.session.loggedInWalletId);
   if (wallet.state.status !== "ready") {
-    await ctx.deleteMessage();
+    if (ctx.update.callback_query?.data === "refresh-balance") {
+      //not to delete the main menu when I click view balance
+      try {
+        await ctx.deleteMessage();
+      } catch (e) {
+        console.log({ e });
+      }
+    }
     await ctx.reply(
       `Hey there. Your wallet is syncing. Please Wait...
         
 Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
       Markup.inlineKeyboard([
-        [Markup.button.callback("Refresh", "wallet-balance")],
+        [Markup.button.callback("Refresh", "refresh-balance")],
         [mainMenuButton()],
       ])
     );

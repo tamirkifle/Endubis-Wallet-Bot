@@ -59,6 +59,7 @@ bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action("wallet-balance", walletBalanceHandler);
+bot.action("refresh-balance", walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
 bot.action("send", Scenes.Stage.enter("sendScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
