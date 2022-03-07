@@ -2,6 +2,7 @@ const formatTxnData = (transaction) => {
   return `Txn ID: ${transaction.id}
 Txn Amount: ${transaction.amount.quantity / 1000000} ada
 Txn Fee: ${transaction.fee.quantity / 1000000} ada
+Type: ${transaction.direction.toUpperCase()} 
 ${
   transaction.inserted_at?.time
     ? `Inserted at: ${String(new Date(transaction.inserted_at.time))}\n`
