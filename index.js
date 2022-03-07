@@ -43,26 +43,14 @@ const stage = new Scenes.Stage([
   sendToAddressScene,
   sendToTelegramScene,
 ]);
-
-bot.use(
-  new LocalSession({
-    database: "wallet_bot_db",
-    format: {
-      serialize: (obj) =>
-        CryptoJS.AES.encrypt(
-          JSON.stringify(obj, null, 2),
-          process.env.SECRET_KEY || "secret key 123"
-        ).toString(), // null & 2 for pretty-formatted JSON
-      deserialize: (str) =>
-        JSON.parse(
-          CryptoJS.AES.decrypt(
-            str,
-            process.env.SECRET_KEY || "secret key 123"
-          ).toString(CryptoJS.enc.Utf8)
-        ),
-    },
-  })
-);
+const localSession = new LocalSession({
+  database: "wallet_bot_db",
+  format: {
+    serialize: (obj) => JSON.stringify(obj, null, 2), // null & 2 for pretty-formatted JSON
+    deserialize: (str) => JSON.parse(str),
+  },
+});
+bot.use(localSession.middleware());
 bot.use(stage.middleware());
 
 bot.start(mainMenuHandler);
