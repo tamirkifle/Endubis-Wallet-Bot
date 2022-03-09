@@ -2,6 +2,7 @@ const { Scenes, Composer } = require("telegraf");
 const { replyMenu } = require("../../utils/btnMenuHelpers");
 const { AddressWallet } = require("cardano-wallet-js");
 const { sendCommonSteps } = require("./sendCommonSteps");
+const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
 /* 
 Step 1
@@ -20,6 +21,8 @@ Step 2
 */
 
 const step2 = new Composer();
+step2.start(mainMenuHandler);
+
 step2.on("text", async (ctx) => {
   //TODO: Validate address
   console.log("here");

@@ -1,6 +1,7 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { changePassphrase } = require("../../utils/loadAccount");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
+const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
 /*
 Steps: 
@@ -27,6 +28,7 @@ Step 2:
 */
 let oldPass;
 const step2 = new Composer();
+step2.start(mainMenuHandler);
 step2.on("text", (ctx) => {
   if (ctx.update.message?.text.length < 10) {
     replyMenu(
@@ -48,6 +50,8 @@ Step 3:
 */
 
 const step3 = new Composer();
+step3.start(mainMenuHandler);
+
 let newPass;
 step3.on("text", (ctx) => {
   console.log("New Passphrase reply: ", ctx.update.message?.text);
@@ -74,6 +78,7 @@ Step 4:
 */
 
 const step4 = new Composer();
+step4.start(mainMenuHandler);
 
 step4.on("text", async (ctx) => {
   console.log("Repeat Passphrase reply: ", ctx.update.message?.text);

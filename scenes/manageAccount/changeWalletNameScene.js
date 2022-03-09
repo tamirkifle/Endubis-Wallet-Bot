@@ -1,6 +1,7 @@
 const { Scenes, Composer } = require("telegraf");
 const { getWalletById } = require("../../utils/loadAccount");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
+const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
 /* 
 Step 1
@@ -22,6 +23,8 @@ Step 2
 - Change wallet name
 */
 const step2 = new Composer();
+step2.start(mainMenuHandler);
+
 step2.on("text", async (ctx) => {
   const newWalletName = ctx.update.message?.text;
   try {

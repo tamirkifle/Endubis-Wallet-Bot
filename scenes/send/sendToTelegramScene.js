@@ -2,6 +2,7 @@ const { Scenes, Composer, Telegraf } = require("telegraf");
 const { listWallets, getWalletByName } = require("../../utils/loadAccount");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 const { sendCommonSteps } = require("./sendCommonSteps");
+const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
 require("dotenv").config();
 const token = process.env.TG_BOT_TOKEN;
@@ -32,6 +33,8 @@ Step 2
 
 */
 const step2 = new Composer();
+step2.start(mainMenuHandler);
+
 step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
   let username = ctx.message.text;
   username = username.match(/^(@)(.*)/)

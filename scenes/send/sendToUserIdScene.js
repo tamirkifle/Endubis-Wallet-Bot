@@ -39,6 +39,8 @@ const step1 = async (ctx) => {
 };
 
 const step2 = new Composer();
+step2.start(mainMenuHandler);
+
 step2.on("text", async (ctx) => {
   ctx.scene.state.amount = Number(ctx.update.message?.text) * 1000000; //to lovelace
   const { amount, receiverAddress } = ctx.scene.state;
@@ -99,6 +101,8 @@ Step 5
 */
 
 const step4 = new Composer();
+step4.start(mainMenuHandler);
+
 step4.on("text", async (ctx) => {
   const passphrase = ctx.update.message?.text;
   const { amount, receiverAddress, wallet } = ctx.scene.state;
