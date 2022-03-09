@@ -1,4 +1,5 @@
 const { Scenes } = require("telegraf");
+const { mainMenuHandler } = require("./mainMenuHandler");
 
 const startPayloadHandler = async (ctx, next) => {
   ctx.scene?.leave();
@@ -20,6 +21,7 @@ const startPayloadHandler = async (ctx, next) => {
       ctx.session.toSendUserId = ctx.startPayload.match(/^(sendto-)(.+)/)[2];
       Scenes.Stage.enter("sendToUserIdScene")(ctx);
     } else {
+      await ctx.reply("You are not logged in.");
       mainMenuHandler(ctx);
     }
   } else {
