@@ -27,11 +27,20 @@ const step1 = async (ctx) => {
     const addresses = await walletToSendTo.getUnusedAddresses();
     ctx.scene.state.receiverAddress = addresses.slice(0, 1)[0];
     const chat = await bot.telegram.getChat(toSendId);
-    await replyMenuHTML(
-      ctx,
-      `User <a href="tg://user?id=${toSendId}">@${chat.username} (${chat.first_name} ${chat.last_name})</a> was found in our database.\nPlease enter the amount to send (in ada)`
-    );
-    return ctx.wizard.next();
+    if (ctx.session.amountToSend) {
+      await ctx.replyWithHTML(
+        `User <a href="tg://user?id=${toSendId}">@${chat.username} (${chat.first_name} ${chat.last_name})</a> was found in our database.`
+      );
+      ctx.scene.state.amount = ctx.session.amountToSend;
+      amountHandler()(ctx);
+      return;
+    } else {
+      await replyMenuHTML(
+        ctx,
+        `User <a href="tg://user?id=${toSendId}">@${chat.username} (${chat.first_name} ${chat.last_name})</a> was found in our database.\nPlease enter the amount to send (in ada)`
+      );
+      return ctx.wizard.next();
+    }
   } catch (e) {
     await ctx.replyWithHTML(`🔴 <b>ERROR</b> \n\n${JSON.stringify(e)}`);
     return mainMenuHandler(ctx);
@@ -40,46 +49,58 @@ const step1 = async (ctx) => {
 
 const step2 = new Composer();
 step2.start(mainMenuHandler);
-
-step2.on("text", async (ctx) => {
-  ctx.scene.state.amount = Number(ctx.update.message?.text) * 1000000; //to lovelace
-  const { amount, receiverAddress } = ctx.scene.state;
-  if (!amount) {
-    replyMenu(
-      ctx,
-      "Invalid Entry, Try again.\n\nPlease enter the amount to send (in ada)"
-    );
-    return;
-  }
-  ctx.scene.state.wallet = await getWalletById(ctx.session?.loggedInWalletId);
-  const { wallet } = ctx.scene.state;
-  try {
-    const estimatedFees = await wallet.estimateFee([receiverAddress], [amount]);
-    if (estimatedFees) {
-      ctx.reply(
-        `Your Available balance: ${
-          wallet.balance.available.quantity / 1000000
-        } ada 
+const amountHandler = () => {
+  return async (ctx) => {
+    if (Number(ctx.message?.text)) {
+      ctx.scene.state.amount = Number(ctx.message?.text) * 1000000; //to lovelace;
+    } else {
+      ctx.scene.state.amount = Number(ctx.session.amountToSend) * 1000000; //to lovelace;
+    }
+    const { amount, receiverAddress } = ctx.scene.state;
+    if (!amount) {
+      replyMenu(
+        ctx,
+        "Invalid Entry, Try again.\n\nPlease enter the amount to send (in ada)"
+      );
+      return;
+    }
+    ctx.scene.state.wallet = await getWalletById(ctx.session?.loggedInWalletId);
+    const { wallet } = ctx.scene.state;
+    try {
+      const estimatedFees = await wallet.estimateFee(
+        [receiverAddress],
+        [amount]
+      );
+      if (estimatedFees) {
+        await ctx.reply(
+          `Your Available balance: ${
+            wallet.balance.available.quantity / 1000000
+          } ada 
 Amount to Send: ${amount / 1000000} ada
 Est. Fees: ${estimatedFees.estimated_min.quantity / 1000000} ada - ${
-          estimatedFees.estimated_max.quantity / 1000000
-        } ada`,
-        Markup.inlineKeyboard([
-          [Markup.button.callback("Proceed", "proceed-txn")],
-          [mainMenuButton("Cancel")],
-        ])
+            estimatedFees.estimated_max.quantity / 1000000
+          } ada`,
+          Markup.inlineKeyboard([
+            [Markup.button.callback("Proceed", "proceed-txn")],
+            [mainMenuButton("Cancel")],
+          ])
+        );
+      }
+      if (ctx.session?.amountToSend) {
+        return ctx.wizard.selectStep(ctx.wizard.cursor + 2);
+      }
+      return ctx.wizard.next();
+    } catch (e) {
+      await ctx.replyWithHTML(`🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
+      await replyMenu(
+        ctx,
+        `Let's try again. Please enter the amount to send (in ada)`
       );
+      return;
     }
-    return ctx.wizard.next();
-  } catch (e) {
-    await ctx.replyWithHTML(`🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
-    await replyMenu(
-      ctx,
-      `Let's try again. Please enter the amount to send (in ada)`
-    );
-  }
-  return;
-});
+  };
+};
+step2.on("text", amountHandler());
 
 /* 
 Step 4
@@ -152,7 +173,12 @@ step5.action("refresh-txn", async (ctx) => {
     `Transaction Details:\n${formatTxnData(transaction)}`,
     Markup.inlineKeyboard([
       [Markup.button.callback("Refresh", "refresh-txn")],
-      [Markup.button.callback("Refresh", "refresh-txn")],
+      [
+        Markup.button.url(
+          "More Details",
+          `https://testnet.cardanoscan.io/transaction/${transaction.id}`
+        ),
+      ],
       [mainMenuButton()],
     ])
   );

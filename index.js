@@ -22,6 +22,7 @@ const { sendToTelegramScene } = require("./scenes/send/sendToTelegramScene");
 const {
   sHandler,
   generalInlineHandler,
+  generalWithAmountHandler,
 } = require("./handlers/inlineQueryHandlers");
 const { startPayloadHandler } = require("./handlers/startPayloadHandler");
 const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
@@ -60,6 +61,8 @@ bot.use(localSession.middleware());
 bot.use(stage.middleware());
 
 bot.inlineQuery("s", sHandler);
+bot.inlineQuery(/(\d+.?\d+)/, generalWithAmountHandler);
+
 bot.on("inline_query", generalInlineHandler);
 
 bot.start(startPayloadHandler, mainMenuHandler);
