@@ -1,3 +1,4 @@
+const { Markup } = require("telegraf");
 const { getReceivingAddress } = require("../utils/loadAccount");
 
 const sHandler = (ctx) => {
@@ -17,10 +18,28 @@ const generalInlineHandler = async (ctx) => {
       title: "Send your receiving address",
       input_message_content: {
         message_text: `Send to me using this address. 
-Feel free to use <a href="http://t.me/Testing_TM_Bot?start=${ctx.session?.loggedInWalletId}">Endubis Testing Wallet</a>:
 <i><b>${address}</b></i>`,
         parse_mode: "HTML",
       },
+    },
+    {
+      type: "article",
+      id: 2,
+      title: "Send your receiving payment link",
+      description:
+        "Send a message with a link to the wallet with your contact pre-filled",
+      input_message_content: {
+        message_text: `Send to @${ctx.from.username} (${ctx.from.first_name} ${ctx.from.last_name})`,
+        parse_mode: "HTML",
+      },
+      ...Markup.inlineKeyboard([
+        [
+          Markup.button.url(
+            "Send",
+            `http://t.me/Testing_TM_Bot?start=sendto-${ctx.from.id}`
+          ),
+        ],
+      ]),
     },
   ];
   ctx.answerInlineQuery(results);

@@ -24,6 +24,7 @@ const {
   generalInlineHandler,
 } = require("./handlers/inlineQueryHandlers");
 const { startPayloadHandler } = require("./handlers/startPayloadHandler");
+const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
 
 require("dotenv").config();
 
@@ -46,6 +47,7 @@ const stage = new Scenes.Stage([
   deleteWalletScene,
   sendToAddressScene,
   sendToTelegramScene,
+  sendToUserIdScene,
 ]);
 const localSession = new LocalSession({
   database: "wallet_bot_db",
