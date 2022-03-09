@@ -1,6 +1,6 @@
 const { Scenes, Composer, Markup } = require("telegraf");
 const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
-const { getWalletById } = require("../utils/loadAccount");
+const { getReceivingAddress } = require("../utils/loadAccount");
 
 // TODO: Generate QR Code
 
@@ -17,14 +17,12 @@ const step1 = (ctx) => {
 
 const step2 = new Composer();
 step2.action("receiving-address", async (ctx) => {
-  const wallet = await getWalletById(ctx.session.loggedInWalletId);
-  const addresses = await wallet.getUnusedAddresses();
-  const firstUnusedAddr = addresses.slice(0, 1)[0];
+  const address = await getReceivingAddress(ctx.session.loggedInWalletId);
   replyMenuHTML(
     ctx,
     `Any funds sent to this address will appear in your wallet.
 
-<i><b>${firstUnusedAddr.id}</b></i>
+<i><b>${address}</b></i>
 `
   );
   return ctx.scene.leave();
