@@ -16,10 +16,14 @@ const {
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
-const { mainMenuButton } = require("./utils/btnMenuHelpers");
 const { sendScene } = require("./scenes/sendScene");
 const { sendToAddressScene } = require("./scenes/send/sendToAddressScene");
 const { sendToTelegramScene } = require("./scenes/send/sendToTelegramScene");
+const {
+  sHandler,
+  generalInlineHandler,
+} = require("./handlers/inlineQueryHandlers");
+const { startPayloadHandler } = require("./handlers/startPayloadHandler");
 
 require("dotenv").config();
 
@@ -53,13 +57,15 @@ const localSession = new LocalSession({
 bot.use(localSession.middleware());
 bot.use(stage.middleware());
 
-bot.start(mainMenuHandler);
+bot.inlineQuery("s", sHandler);
+bot.on("inline_query", generalInlineHandler);
 
+bot.start(startPayloadHandler, mainMenuHandler);
+// bot.start(mainMenuHandler);
 bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
-bot.action("wallet-balance", walletBalanceHandler);
-bot.action("refresh-balance", walletBalanceHandler);
+bot.action(["wallet-balance", "refresh-balance"], walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
 bot.action("send", Scenes.Stage.enter("sendScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
