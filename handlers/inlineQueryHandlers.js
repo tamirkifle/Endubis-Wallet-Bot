@@ -29,7 +29,7 @@ const generalInlineHandler = async (ctx) => {
       description:
         "Send a message with a link to the wallet with your contact pre-filled",
       input_message_content: {
-        message_text: `Send to @${ctx.from.username} (${ctx.from.first_name} ${ctx.from.last_name})`,
+        message_text: `Send to <b>@${ctx.from.username}</b> (<b>${ctx.from.first_name} ${ctx.from.last_name}</b>)`,
         parse_mode: "HTML",
       },
       ...Markup.inlineKeyboard([
@@ -53,9 +53,9 @@ const generalWithAmountHandler = async (ctx) => {
       {
         type: "article",
         id: 1,
-        title: `Send your receiving address for a payment of ${amountToSend} ada`,
+        title: `Send your receiving address for a ${amountToSend} ada payment`,
         input_message_content: {
-          message_text: `Send me <b>${amountToSend} ada</b> using this address. 
+          message_text: `Send me <i><b>${amountToSend} ada</b></i> using this address. 
 <i><b>${address}</b></i>`,
           parse_mode: "HTML",
         },
@@ -67,7 +67,7 @@ const generalWithAmountHandler = async (ctx) => {
         description:
           "Send a message with a link to the wallet with your contact pre-filled",
         input_message_content: {
-          message_text: `Send ${amountToSend} ada to @${ctx.from.username} (${ctx.from.first_name} ${ctx.from.last_name})`,
+          message_text: `<b>@${ctx.from.username}</b> (<b>${ctx.from.first_name} ${ctx.from.last_name}</b>) has requested <i><b>${amountToSend} ada</b></i>`,
           parse_mode: "HTML",
         },
         ...Markup.inlineKeyboard([
