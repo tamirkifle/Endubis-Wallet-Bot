@@ -36,7 +36,7 @@ const generalInlineHandler = async (ctx) => {
         [
           Markup.button.url(
             "Send",
-            `http://t.me/Testing_TM_Bot?start=sendto-${ctx.from.id}`
+            `http://t.me/Testing_TM_Bot?start=sendto=${ctx.from.id}`
           ),
         ],
       ]),
@@ -48,7 +48,6 @@ const generalInlineHandler = async (ctx) => {
 const generalWithAmountHandler = async (ctx) => {
   if (Number(ctx.match[1])) {
     const amountToSend = Number(ctx.match[1]);
-    ctx.session.amountToSend = amountToSend;
     const address = await getReceivingAddress(ctx.session?.loggedInWalletId);
     const results = [
       {
@@ -75,7 +74,7 @@ const generalWithAmountHandler = async (ctx) => {
           [
             Markup.button.url(
               `Send ${amountToSend} ada to @${ctx.from.username}`,
-              `http://t.me/Testing_TM_Bot?start=sendto-${ctx.from.id}&amount-${amountToSend}`
+              `http://t.me/Testing_TM_Bot?start=sendto=${ctx.from.id}-amount=${amountToSend}`
             ),
           ],
         ]),

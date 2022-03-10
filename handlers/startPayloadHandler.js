@@ -14,11 +14,21 @@ const startPayloadHandler = async (ctx, next) => {
     } else {
       mainMenuHandler(ctx);
     }
-  } else if (ctx.startPayload.match(/^(sendto-)(.+)/)[2]) {
-    //Payment links: payload starting with "sendto-"
-    console.log("Sending to ", ctx.startPayload.match(/^(sendto-)(.+)/)[2]);
+  } else if (ctx.startPayload.match(/^sendto[=-](.+)/)[1]) {
+    //sendto[=-] to support the old sendto- links
+    //Payment links: payload starting with "sendto=" and could have "amount="
     if (ctx.session?.loggedInWalletId) {
-      ctx.session.toSendUserId = ctx.startPayload.match(/^(sendto-)(.+)/)[2];
+      if (ctx.startPayload.match(/^sendto[=-](.+)-amount=(.+)/)) {
+        ctx.session.toSendUserId = ctx.startPayload.match(
+          /^sendto[=-](.+)-amount=(.+)/
+        )[1];
+        ctx.session.amountToSend = ctx.startPayload.match(
+          /^sendto[=-](.+)-amount=(.+)/
+        )[2];
+      } else {
+        ctx.session.toSendUserId = ctx.startPayload.match(/^sendto[=-](.+)/)[1];
+        ctx.session.amountToSend = null;
+      }
       Scenes.Stage.enter("sendToUserIdScene")(ctx);
     } else {
       await ctx.reply("You are not logged in.");
