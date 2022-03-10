@@ -61,7 +61,7 @@ bot.use(localSession.middleware());
 bot.use(stage.middleware());
 
 bot.inlineQuery("s", sHandler);
-bot.inlineQuery(/(\d+.?\d+)/, generalWithAmountHandler);
+bot.inlineQuery(/(\d+.?\d*)/, generalWithAmountHandler);
 
 bot.on("inline_query", generalInlineHandler);
 
