@@ -48,6 +48,12 @@ const getTransactions = async (wallet) => {
   return transactions;
 };
 
+const getReceivingAddress = async (walletId) => {
+  const wallet = await getWalletById(walletId);
+  const addresses = await wallet.getUnusedAddresses();
+  return addresses.slice(0, 1)[0].id;
+};
+
 const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
   const wallet = await getWalletById(walletId);
   const result = await wallet.updatePassphrase(oldPassphrase, newPassphrase);
@@ -99,4 +105,5 @@ module.exports = {
   listWallets,
   getWalletByName,
   idFromSeed,
+  getReceivingAddress,
 };
