@@ -21,6 +21,23 @@ Step 1
 - Take userid from session and ask for amount
 */
 const step1 = async (ctx) => {
+  if (ctx.session?.expiryTime && Date.now() > Number(ctx.session.expiryTime)) {
+    //EXPIRED
+    await replyMenu(ctx, "Sorry. The button you clicked has expired.");
+    return ctx.scene.leave();
+  } else if (ctx.session?.expiryTime) {
+    ctx.replyWithHTML(
+      `<i><b>Note: Link expires in 00:${String(
+        Math.floor((ctx.session.expiryTime - Date.now()) / 60000)
+      ).padStart(2, 0)}:${String(
+        Math.floor(
+          ((ctx.session.expiryTime - Date.now()) / 60000 -
+            Math.floor((ctx.session.expiryTime - Date.now()) / 60000)) *
+            60
+        )
+      ).padStart(2, 0)}</b></i>`
+    );
+  }
   try {
     const toSendId = ctx.session?.toSendUserId;
     const walletToSendTo = await getWalletByName(String(toSendId));

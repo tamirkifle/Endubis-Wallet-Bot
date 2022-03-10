@@ -1,4 +1,5 @@
 const { Scenes } = require("telegraf");
+const { replyMenu } = require("../utils/btnMenuHelpers");
 const { mainMenuHandler } = require("./mainMenuHandler");
 
 const startPayloadHandler = async (ctx, next) => {
@@ -6,38 +7,47 @@ const startPayloadHandler = async (ctx, next) => {
   if (!ctx.startPayload) {
     return next();
   }
+  const decodedPayload = Buffer.from(ctx.startPayload, "base64").toString();
+
   if (ctx.startPayload === "send") {
     //switch_pm_parameter
-    await ctx.deleteMessage();
-    if (ctx.session?.loggedInWalletId) {
-      Scenes.Stage.enter("sendScene")(ctx);
-    } else {
-      mainMenuHandler(ctx);
+    if (!ctx.session?.loggedInWalletId) {
+      return mainMenuHandler(ctx);
     }
-  } else if (ctx.startPayload.match(/^sendto[=-](.+)/)[1]) {
-    //sendto[=-] to support the old sendto- links
-    //Payment links: payload starting with "sendto=" and could have "amount="
-    if (ctx.session?.loggedInWalletId) {
-      if (ctx.startPayload.match(/^sendto[=-](.+)-amount=(.+)/)) {
-        ctx.session.toSendUserId = ctx.startPayload.match(
-          /^sendto[=-](.+)-amount=(.+)/
-        )[1];
-        ctx.session.amountToSend = ctx.startPayload.match(
-          /^sendto[=-](.+)-amount=(.+)/
-        )[2];
-      } else {
-        ctx.session.toSendUserId = ctx.startPayload.match(/^sendto[=-](.+)/)[1];
-        ctx.session.amountToSend = null;
-      }
-      Scenes.Stage.enter("sendToUserIdScene")(ctx);
-    } else {
+    Scenes.Stage.enter("sendScene")(ctx);
+  } else if (decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)) {
+    //matches sendto and expiry with and without amount
+    if (!ctx.session?.loggedInWalletId) {
       await ctx.reply("You are not logged in.");
-      mainMenuHandler(ctx);
+      return mainMenuHandler(ctx);
     }
+    if (decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)) {
+      ctx.session.toSendUserId = decodedPayload.match(
+        /^sendto[=-](.+)&amount=(.+)&expiry=(.+)/
+      )[1];
+      ctx.session.amountToSend = decodedPayload.match(
+        /^sendto[=-](.+)&amount=(.+)&expiry=(.+)/
+      )[2];
+      ctx.session.expiryTime =
+        1 * 3600000 +
+        Number(
+          decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)[3]
+        ); //1 hour expiry
+    } else {
+      ctx.session.toSendUserId = decodedPayload.match(
+        /^sendto[=-](.+)&expiry=(.+)/
+      )[1];
+      ctx.session.expiryTime =
+        1 * 3600000 +
+        decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)[2];
+      ctx.session.amountToSend = null;
+    }
+    Scenes.Stage.enter("sendToUserIdScene")(ctx);
   } else {
     //if it's not an inline-querty switch-pm and there is a payload, then it is a referral code
     //TODO: Handle Referrals
-    ctx.startPayload && console.log("referral-code: " + ctx.startPayload);
+    await replyMenu(ctx, "Invalid link!");
+    return;
   }
 };
 

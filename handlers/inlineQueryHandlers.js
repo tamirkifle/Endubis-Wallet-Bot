@@ -48,6 +48,9 @@ const generalInlineHandler = async (ctx) => {
 const generalWithAmountHandler = async (ctx) => {
   if (Number(ctx.match[1])) {
     const amountToSend = Number(ctx.match[1]);
+    const startPayload = Buffer.from(
+      `sendto=${ctx.from.id}&amount=${amountToSend}&expiry=${Date.now()}`
+    ).toString("base64");
     const address = await getReceivingAddress(ctx.session?.loggedInWalletId);
     const results = [
       {
@@ -67,14 +70,15 @@ const generalWithAmountHandler = async (ctx) => {
         description:
           "Send a message with a link to the wallet with your contact pre-filled",
         input_message_content: {
-          message_text: `<b>@${ctx.from.username}</b> (<b>${ctx.from.first_name} ${ctx.from.last_name}</b>) has requested <i><b>${amountToSend} ada</b></i>`,
+          message_text: `<b>@${ctx.from.username}</b> (<b>${ctx.from.first_name} ${ctx.from.last_name}</b>) has requested <i><b>${amountToSend} ada</b></i>
+<i>Note: The payment button below expires after one hour</i>`,
           parse_mode: "HTML",
         },
         ...Markup.inlineKeyboard([
           [
             Markup.button.url(
               `Send ${amountToSend} ada to @${ctx.from.username}`,
-              `http://t.me/Testing_TM_Bot?start=sendto=${ctx.from.id}-amount=${amountToSend}`
+              `http://t.me/Testing_TM_Bot?start=${startPayload}`
             ),
           ],
         ]),
