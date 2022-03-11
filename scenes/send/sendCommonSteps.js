@@ -95,6 +95,12 @@ Transaction Details:
 ${formatTxnData(transaction)}`,
         Markup.inlineKeyboard([
           [Markup.button.callback("Refresh", "refresh-txn")],
+          [
+            Markup.button.url(
+              "More Details",
+              `https://testnet.cardanoscan.io/transaction/${transaction.id}`
+            ),
+          ],
           [mainMenuButton()],
         ])
       );
@@ -127,6 +133,12 @@ ${formatTxnData(transaction)}`,
       `Transaction Details:\n${formatTxnData(transaction)}`,
       Markup.inlineKeyboard([
         [Markup.button.callback("Refresh", "refresh-txn")],
+        [
+          Markup.button.url(
+            "More Details",
+            `https://testnet.cardanoscan.io/transaction/${transaction.id}`
+          ),
+        ],
         [mainMenuButton()],
       ])
     );
