@@ -1,4 +1,11 @@
-const { Seed, WalletServer } = require("cardano-wallet-js");
+const { Seed, WalletServer, ShelleyWallet } = require("cardano-wallet-js");
+const {
+  TransactionsApi,
+  AddressesApi,
+  CoinSelectionsApi,
+  StakePoolsApi,
+  WalletsApi,
+} = require("cardano-wallet-js/dist/api");
 
 let walletServer = WalletServer.init("http://localhost:8090/v2");
 
@@ -92,6 +99,27 @@ const idFromSeed = async (seedPhrases) => {
   return stdout.trim();
 };
 
+const makeShelleyWallet = (wallet) => {
+  const shelley = Object.assign(new ShelleyWallet(), wallet);
+  shelley.transactionsApi = Object.assign(
+    new TransactionsApi(),
+    shelley.transactionsApi
+  );
+  shelley.addressesApi = Object.assign(
+    new AddressesApi(),
+    shelley.addressesApi
+  );
+  shelley.coinSelectionsApi = Object.assign(
+    new CoinSelectionsApi(),
+    shelley.coinSelectionsApi
+  );
+  shelley.stakePoolApi = Object.assign(
+    new StakePoolsApi(),
+    shelley.stakePoolApi
+  );
+  shelley.walletsApi = Object.assign(new WalletsApi(), shelley.walletsApi);
+  return shelley;
+};
 (async function () {
   listWallets();
 })();
@@ -106,4 +134,5 @@ module.exports = {
   getWalletByName,
   idFromSeed,
   getReceivingAddress,
+  makeShelleyWallet,
 };

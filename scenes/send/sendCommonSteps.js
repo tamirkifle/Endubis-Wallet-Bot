@@ -1,8 +1,9 @@
 const { Composer, Markup } = require("telegraf");
-const { getWalletById } = require("../../utils/loadAccount");
+const { getWalletById, makeShelleyWallet } = require("../../utils/loadAccount");
 const { replyMenu, mainMenuButton } = require("../../utils/btnMenuHelpers");
 const { formatTxnData } = require("../../utils/formatTxnData");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
+const { ShelleyWallet } = require("cardano-wallet-js");
 
 const sendCommonSteps = (errorMsg) => {
   /* 
@@ -81,6 +82,9 @@ Step 5
 
   step5.on("text", async (ctx) => {
     const passphrase = ctx.update.message?.text;
+    if (!(ctx.scene.state.wallet instanceof ShelleyWallet)) {
+      ctx.scene.state.wallet = makeShelleyWallet(ctx.scene.state.wallet);
+    }
     const { amount, receiverAddress, wallet } = ctx.scene.state;
     try {
       ctx.scene.state.transaction = await wallet.sendPayment(
@@ -116,6 +120,9 @@ ${formatTxnData(transaction)}`,
 
   const step6 = new Composer();
   step6.action("refresh-txn", async (ctx) => {
+    if (!(ctx.scene.state.wallet instanceof ShelleyWallet)) {
+      ctx.scene.state.wallet = makeShelleyWallet(ctx.scene.state.wallet);
+    }
     const { wallet } = ctx.scene.state;
     ctx.scene.state.transaction = await wallet.getTransaction(
       ctx.scene.state.transaction.id
