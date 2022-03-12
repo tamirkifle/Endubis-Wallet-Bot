@@ -1,5 +1,6 @@
 const { Markup } = require("telegraf");
 const { getReceivingAddress } = require("../utils/loadAccount");
+const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 const sHandler = (ctx) => {
   const results = [];
@@ -7,6 +8,28 @@ const sHandler = (ctx) => {
     switch_pm_text: "Send using Wallet",
     switch_pm_parameter: "send",
   });
+};
+const qrHandler = async (ctx) => {
+  const startPayload = Buffer.from(
+    `sendto=${ctx.from.id}&expiry=${Date.now()}`
+  ).toString("base64");
+  const file_id = await generateQrFileId(
+    ctx,
+    `http://t.me/Testing_TM_Bot?start=${startPayload}`
+  );
+  const results = [
+    {
+      type: "photo",
+      id: 1,
+      photo_file_id: file_id,
+      title: `Send a payment QR Code`,
+      description:
+        "Send a message with a QR Code for receiving payments to your address",
+      caption: `Send to <b>@${ctx.from.username}</b>(<b>${ctx.from.first_name} ${ctx.from.last_name}</b>)`,
+      parse_mode: "HTML",
+    },
+  ];
+  ctx.answerInlineQuery(results);
 };
 
 const generalInlineHandler = async (ctx) => {
@@ -90,4 +113,9 @@ const generalWithAmountHandler = async (ctx) => {
     ctx.answerInlineQuery(results);
   }
 };
-module.exports = { sHandler, generalInlineHandler, generalWithAmountHandler };
+module.exports = {
+  sHandler,
+  qrHandler,
+  generalInlineHandler,
+  generalWithAmountHandler,
+};

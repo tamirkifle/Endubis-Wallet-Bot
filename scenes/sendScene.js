@@ -27,12 +27,12 @@ Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
     Markup.inlineKeyboard([
       [Markup.button.callback("Send to a Cardano address", "send-addr")],
       [Markup.button.callback("Send to a Telegram user", "send-tg-user")],
-      [
-        Markup.button.callback(
-          "IN CONSTRUCTION: Send using a QR Code",
-          "send-qr-code"
-        ),
-      ],
+      // [
+      //   Markup.button.callback(
+      //     "IN CONSTRUCTION: Send using a QR Code",
+      //     "send-qr-code"
+      //   ),
+      // ],
       [mainMenuButton()],
     ])
   );
