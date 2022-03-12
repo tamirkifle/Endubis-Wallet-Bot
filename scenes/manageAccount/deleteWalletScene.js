@@ -47,7 +47,7 @@ step2.hears("✅ Yes", async (ctx) => {
   return ctx.scene.leave();
 });
 step2.hears("❌ No", async (ctx) => {
-  await ctx.reply("Aborting...", Markup.removeKeyboard());
+  await ctx.reply("Aborting...", Markup.keyboard([["🏠 Main Menu"]]).resize());
 
   return mainMenuHandler(ctx);
 });

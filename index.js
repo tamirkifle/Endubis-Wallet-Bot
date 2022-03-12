@@ -68,6 +68,7 @@ bot.inlineQuery(/(\d+.?\d*)/, generalWithAmountHandler);
 bot.on("inline_query", generalInlineHandler);
 
 bot.start(startPayloadHandler, mainMenuHandler);
+bot.hears("🏠 Main Menu", mainMenuHandler);
 // bot.start(mainMenuHandler);
 bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 

@@ -4,7 +4,7 @@
   "description": "A telegram bot wallet for Cardano assets.",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon --inspect -x 'node index.js || touch index.js'  2>&1 | tee -a app2.log",
+    "serve": "nodemon -x 'node index.js || touch index.js'  2>&1 | tee -a app2.log",
     "start": "nodemon --inspect index.js  2>&1 | tee -a app2.log"
   },
   "keywords": [
