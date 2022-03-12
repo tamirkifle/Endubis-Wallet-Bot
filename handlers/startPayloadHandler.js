@@ -39,7 +39,7 @@ const startPayloadHandler = async (ctx, next) => {
       )[1];
       ctx.session.expiryTime =
         1 * 3600000 +
-        decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)[2];
+        Number(decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)[2]); //1 hour expiry
       ctx.session.amountToSend = null;
     }
     Scenes.Stage.enter("sendToUserIdScene")(ctx);

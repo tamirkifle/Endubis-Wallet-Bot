@@ -11,6 +11,9 @@ const sHandler = (ctx) => {
 
 const generalInlineHandler = async (ctx) => {
   const address = await getReceivingAddress(ctx.session?.loggedInWalletId);
+  const startPayload = Buffer.from(
+    `sendto=${ctx.from.id}&expiry=${Date.now()}`
+  ).toString("base64");
   const results = [
     {
       type: "article",
@@ -36,7 +39,7 @@ const generalInlineHandler = async (ctx) => {
         [
           Markup.button.url(
             "Send",
-            `http://t.me/Testing_TM_Bot?start=sendto=${ctx.from.id}`
+            `http://t.me/Testing_TM_Bot?start=${startPayload}`
           ),
         ],
       ]),
