@@ -15,8 +15,8 @@ const startPayloadHandler = async (ctx, next) => {
       return mainMenuHandler(ctx);
     }
     Scenes.Stage.enter("sendScene")(ctx);
-  } else if (decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)) {
-    //matches sendto and expiry with and without amount
+  } else if (decodedPayload.match(/^sendto[=-](.+)/)) {
+    //matches sendto with and without amount and expiry
     if (!ctx.session?.loggedInWalletId) {
       await ctx.reply("You are not logged in.");
       return mainMenuHandler(ctx);
@@ -33,13 +33,17 @@ const startPayloadHandler = async (ctx, next) => {
         Number(
           decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)[3]
         ); //1 hour expiry
-    } else {
+    } else if (decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)) {
       ctx.session.toSendUserId = decodedPayload.match(
         /^sendto[=-](.+)&expiry=(.+)/
       )[1];
       ctx.session.expiryTime =
         1 * 3600000 +
         Number(decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)[2]); //1 hour expiry
+      ctx.session.amountToSend = null;
+    } else {
+      ctx.session.toSendUserId = decodedPayload.match(/^sendto[=-](.+)/)[1];
+      ctx.session.expiryTime = null; //no expiry
       ctx.session.amountToSend = null;
     }
     Scenes.Stage.enter("sendToUserIdScene")(ctx);

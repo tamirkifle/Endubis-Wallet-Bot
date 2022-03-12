@@ -10,9 +10,7 @@ const sHandler = (ctx) => {
   });
 };
 const qrHandler = async (ctx) => {
-  const startPayload = Buffer.from(
-    `sendto=${ctx.from.id}&expiry=${Date.now()}`
-  ).toString("base64");
+  const startPayload = Buffer.from(`sendto=${ctx.from.id}`).toString("base64");
   const file_id = await generateQrFileId(
     ctx,
     `http://t.me/Testing_TM_Bot?start=${startPayload}`
@@ -34,9 +32,7 @@ const qrHandler = async (ctx) => {
 
 const generalInlineHandler = async (ctx) => {
   const address = await getReceivingAddress(ctx.session?.loggedInWalletId);
-  const startPayload = Buffer.from(
-    `sendto=${ctx.from.id}&expiry=${Date.now()}`
-  ).toString("base64");
+  const startPayload = Buffer.from(`sendto=${ctx.from.id}`).toString("base64");
   const results = [
     {
       type: "article",
@@ -110,7 +106,7 @@ const generalWithAmountHandler = async (ctx) => {
         ]),
       },
     ];
-    ctx.answerInlineQuery(results);
+    ctx.answerInlineQuery(results, { cache_time: 0 });
   }
 };
 module.exports = {
