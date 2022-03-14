@@ -20,9 +20,16 @@ const replyMenuHTML = (ctx, mdMessage) => {
     Markup.inlineKeyboard([[mainMenuButton()]])
   );
 };
+const replyMenuPhoto = (ctx, photo, otherOptions = {}) => {
+  return ctx.replyWithPhoto(photo, {
+    ...otherOptions,
+    ...Markup.inlineKeyboard([[mainMenuButton()]]),
+  });
+};
 module.exports = {
   replyMenu,
   replyMenuMDV2,
   replyMenuHTML,
+  replyMenuPhoto,
   mainMenuButton,
 };

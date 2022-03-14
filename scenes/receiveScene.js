@@ -1,6 +1,11 @@
 const { Scenes, Composer, Markup } = require("telegraf");
-const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
+const {
+  mainMenuButton,
+  replyMenuHTML,
+  replyMenuPhoto,
+} = require("../utils/btnMenuHelpers");
 const { getReceivingAddress } = require("../utils/loadAccount");
+const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 // TODO: Generate QR Code
 
@@ -9,6 +14,7 @@ const step1 = (ctx) => {
     "Please choose an option from the choices below",
     Markup.inlineKeyboard([
       [Markup.button.callback("Get Receiving Address", "receiving-address")],
+      [Markup.button.callback("Get Receiving QR Code", "receiving-qr")],
       [mainMenuButton()],
     ])
   );
@@ -25,6 +31,18 @@ step2.action("receiving-address", async (ctx) => {
 <i><b>${address}</b></i>
 `
   );
+  return ctx.scene.leave();
+});
+step2.action("receiving-qr", async (ctx) => {
+  const startPayload = Buffer.from(`sendto=${ctx.from.id}`).toString("base64");
+  const file_id = await generateQrFileId(
+    ctx,
+    `http://t.me/Testing_TM_Bot?start=${startPayload}`
+  );
+  await replyMenuPhoto(ctx, file_id, {
+    caption: `<b>@${ctx.from.username}</b>(<b>${ctx.from.first_name} ${ctx.from.last_name}</b>)`,
+    parse_mode: "HTML",
+  });
   return ctx.scene.leave();
 });
 

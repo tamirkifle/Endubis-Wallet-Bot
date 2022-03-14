@@ -15,22 +15,25 @@ if (token === undefined) {
 
 const bot = new Telegraf(token);
 
-const generateQr = (data, image = "https://svgshare.com/i/f4r.svg") => {
+const generateQr = (data, image = "https://svgshare.com/i/f84.svg") => {
   const obj = {
     nodeCanvas,
     width: 300,
     height: 300,
     data,
     dotsOptions: {
-      color: "#4f4f07",
-      type: "rounded",
+      color: "#033859",
+      // color: "#4f4f07",
+      type: "square",
     },
+    cornersSquareOptions: { type: "square" },
     backgroundOptions: {
-      color: "#e9ebee",
+      color: "#ffedd1",
+      // color: "#e9ebee",
     },
     imageOptions: {
       crossOrigin: "anonymous",
-      margin: 20,
+      margin: 0,
     },
   };
   if (image) {
