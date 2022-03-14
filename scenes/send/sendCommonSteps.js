@@ -95,7 +95,7 @@ Step 5
         [amount]
       );
       const { transaction } = ctx.scene.state;
-      ctx.reply(
+      ctx.replyWithHTML(
         `Transaction Successfully Submitted.
 Transaction Details: 
 ${formatTxnData(transaction)}`,
@@ -136,13 +136,13 @@ ${formatTxnData(transaction)}`,
       console.log(error);
     }
     if (transaction.status === "in_ledger") {
-      await ctx.reply(
+      await ctx.replyWithHTML(
         `Transaction Details:\n${formatTxnData(transaction)}`,
         Markup.inlineKeyboard([[mainMenuButton()]])
       );
       return ctx.scene.leave();
     }
-    await ctx.reply(
+    await ctx.replyWithHTML(
       `Transaction Details:\n${formatTxnData(transaction)}`,
       Markup.inlineKeyboard([
         [Markup.button.callback("Refresh", "refresh-txn")],

@@ -170,7 +170,7 @@ step4.on("text", async (ctx) => {
       [amount]
     );
     const { transaction } = ctx.scene.state;
-    ctx.reply(
+    ctx.replyWithHTML(
       `Transaction Successfully Submitted.
 Transaction Details: 
 ${formatTxnData(transaction)}`,
@@ -212,13 +212,19 @@ step5.action("refresh-txn", async (ctx) => {
     console.log(error);
   }
   if (transaction.status === "in_ledger") {
-    await ctx.reply(
+    await ctx.replyWithHTML(
       `Transaction Details:\n${formatTxnData(transaction)}`,
+      [
+        Markup.button.url(
+          "More Details",
+          `https://testnet.cardanoscan.io/transaction/${transaction.id}`
+        ),
+      ],
       Markup.inlineKeyboard([[mainMenuButton()]])
     );
     return ctx.scene.leave();
   }
-  await ctx.reply(
+  await ctx.replyWithHTML(
     `Transaction Details:\n${formatTxnData(transaction)}`,
     Markup.inlineKeyboard([
       [Markup.button.callback("Refresh", "refresh-txn")],
