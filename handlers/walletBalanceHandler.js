@@ -3,15 +3,15 @@ const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
 const { getWalletById } = require("../utils/loadAccount");
 const { mainMenuHandler } = require("./mainMenuHandler");
 
-const formatWalletData = (wallet, name) => {
-  return `Here's your wallet information, ${name}:
-
-Wallet Total Balance: <tg-spoiler>${
-    wallet.balance.total.quantity / 1000000
-  } ada</tg-spoiler>
-Wallet Available Balance: <tg-spoiler>${
+const formatWalletDataHTML = (wallet, name) => {
+  /*<b>Available Balance:</b> <tg-spoiler><i>${
     wallet.balance.available.quantity / 1000000
-  } ada</tg-spoiler>
+  } ada</i></tg-spoiler>*/
+  return `Here's your wallet information, <b>${name}</b>:
+
+<b>Total Balance:</b> <tg-spoiler><i>${
+    wallet.balance.total.quantity / 1000000
+  } ada</i></tg-spoiler>
 `;
 };
 
@@ -30,7 +30,7 @@ const walletBalanceHandler = async (ctx) => {
       }
     }
     await ctx.reply(
-      `Hey there. Your wallet is syncing. Please Wait...
+      `Hey ${ctx.session.userInfo?.first_name}. Your wallet is syncing. Please Wait...
         
 Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
       Markup.inlineKeyboard([
@@ -41,7 +41,7 @@ Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
   } else {
     replyMenuHTML(
       ctx,
-      formatWalletData(wallet, ctx.session.userInfo?.first_name)
+      formatWalletDataHTML(wallet, ctx.session.userInfo?.first_name)
     );
   }
 };
