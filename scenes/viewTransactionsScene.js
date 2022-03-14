@@ -7,6 +7,20 @@ const {
 } = require("../utils/btnMenuHelpers");
 const { formatTxnData } = require("../utils/formatTxnData");
 
+const step1 = (ctx) => {
+  ctx.reply(
+    `Please choose a filter option to see your list of transactions`,
+    Markup.inlineKeyboard([
+      [Markup.button.callback("By Time Frame 🕒", "txns-by-time")],
+      [Markup.button.callback("Sent 🔺", "txns-sent")],
+      [Markup.button.callback("Received 🟢", "txns-received")],
+      [Markup.button.callback("All transactions", "txns-all")],
+      [mainMenuButton()],
+    ])
+  );
+  return ctx.wizard.next();
+};
+
 /* 
 Step 1
 - Give user choice of time frame
@@ -19,20 +33,29 @@ Step 1
 
 */
 
-const step1 = (ctx) => {
+const step2 = new Composer();
+step2.action("txns-by-time", (ctx) => {
   ctx.reply(
     `Choose time frame to see transactions`,
     Markup.inlineKeyboard([
-      [Markup.button.callback("All time", "txns-all-time")],
       [Markup.button.callback("Past month", "txns-past-month")],
       [Markup.button.callback("Past 3 months", "txns-past-3-months")],
       [Markup.button.callback("Past 6 months", "txns-past-6-months")],
       [Markup.button.callback("Past year", "txns-past-year")],
+      [Markup.button.callback("All time", "txns-all-time")],
       [mainMenuButton()],
     ])
   );
   return ctx.wizard.next();
-};
+});
+
+step2.action("txns-sent", (ctx) =>
+  txnListHandler(ctx, { direction: "outgoing" })
+);
+step2.action("txns-received", (ctx) =>
+  txnListHandler(ctx, { direction: "incoming" })
+);
+step2.action("txns-all", (ctx) => txnListHandler(ctx));
 
 /* 
 Step 2
@@ -42,14 +65,22 @@ Step 2
   - Ask for start date
 */
 
-const txnListHandler = async (ctx, monthsOfTxns) => {
+const txnListHandler = async (ctx, { months: monthsOfTxns, direction }) => {
   const wallet = await getWalletById(ctx.session.loggedInWalletId);
-  const oneMonthInMS = 2629800000;
-  const endDate = new Date(Date.now());
-  const startDate = new Date(Date.now() - oneMonthInMS * monthsOfTxns);
-  const txns = monthsOfTxns
-    ? await wallet.getTransactions(startDate, endDate)
-    : await wallet.getTransactions();
+  let txns;
+  if (monthsOfTxns) {
+    const oneMonthInMS = 2629800000;
+    const endDate = new Date(Date.now());
+    const startDate = new Date(Date.now() - oneMonthInMS * monthsOfTxns);
+    txns = await wallet.getTransactions(startDate, endDate);
+  } else if (direction) {
+    txns = await wallet.getTransactions();
+    txns = txns.filter(
+      (txn) => txn.direction === String(direction).toLowerCase()
+    );
+  } else {
+    txns = await wallet.getTransactions();
+  }
   const customInlineKeyboard = (index, txnId) => {
     if (index === txns.length - 1) {
       return Markup.inlineKeyboard([
@@ -73,12 +104,8 @@ const txnListHandler = async (ctx, monthsOfTxns) => {
   };
 
   for (const [index, txn] of txns.entries()) {
-    await ctx.reply(
-      `${
-        index === 0
-          ? "Here is your list of transactions. Click More Details to see more."
-          : ""
-      }
+    await ctx.replyWithHTML(
+      `${index === 0 ? "Click More Details to see more." : ""}
   
 Transaction #${txns.length - index}
 ${formatTxnData(txn)}`,
@@ -88,17 +115,18 @@ ${formatTxnData(txn)}`,
   return;
 };
 
-const step2 = new Composer();
-step2.action("txns-all-time", (ctx) => txnListHandler(ctx));
-step2.action("txns-past-month", (ctx) => txnListHandler(ctx, 1));
-step2.action("txns-past-3-months", (ctx) => txnListHandler(ctx, 3));
-step2.action("txns-past-6-months", (ctx) => txnListHandler(ctx, 6));
-step2.action("txns-past-year", (ctx) => txnListHandler(ctx, 12));
+const step3 = new Composer();
+step3.action("txns-all-time", (ctx) => txnListHandler(ctx));
+step3.action("txns-past-month", (ctx) => txnListHandler(ctx, { months: 1 }));
+step3.action("txns-past-3-months", (ctx) => txnListHandler(ctx, { months: 3 }));
+step3.action("txns-past-6-months", (ctx) => txnListHandler(ctx, { months: 6 }));
+step3.action("txns-past-year", (ctx) => txnListHandler(ctx, { months: 12 }));
 
 const viewTransactionsScene = new Scenes.WizardScene(
   "viewTransactionsScene",
   step1,
-  step2
+  step2,
+  step3
 );
 
 module.exports = { viewTransactionsScene };
