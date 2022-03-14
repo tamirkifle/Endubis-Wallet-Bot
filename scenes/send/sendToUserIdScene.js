@@ -71,6 +71,8 @@ const step1 = async (ctx) => {
 
 const step2 = new Composer();
 step2.start(mainMenuHandler);
+step2.hears("🏠 Main Menu", mainMenuHandler);
+
 const amountHandler = () => {
   return async (ctx) => {
     if (Number(ctx.message?.text)) {
@@ -145,6 +147,7 @@ Step 5
 
 const step4 = new Composer();
 step4.start(mainMenuHandler);
+step4.hears("🏠 Main Menu", mainMenuHandler);
 
 step4.on("text", async (ctx) => {
   const passphrase = ctx.update.message?.text;

@@ -27,6 +27,7 @@ Step 2:
 */
 const step2 = new Composer();
 step2.start(mainMenuHandler);
+step2.hears("🏠 Main Menu", mainMenuHandler);
 step2.on("text", async (ctx) => {
   //TODO: Validate the seed phrase
   if (ctx.message.text.trim().split(" ").length < 15) {
@@ -66,6 +67,7 @@ step2.use((ctx) => {
 
 const step3 = new Composer();
 step3.start(mainMenuHandler);
+step3.hears("🏠 Main Menu", mainMenuHandler);
 
 step3.on("text", async (ctx) => {
   if (ctx.message.text.length < 10) {

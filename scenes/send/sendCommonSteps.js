@@ -15,6 +15,7 @@ Step 3
 */
   const step3 = new Composer();
   step3.start(mainMenuHandler);
+  step3.hears("🏠 Main Menu", mainMenuHandler);
 
   step3.on("text", async (ctx) => {
     ctx.scene.state.amount = Number(ctx.update.message?.text) * 1000000; //to lovelace
@@ -79,6 +80,7 @@ Step 5
 
   const step5 = new Composer();
   step5.start(mainMenuHandler);
+  step5.hears("🏠 Main Menu", mainMenuHandler);
 
   step5.on("text", async (ctx) => {
     const passphrase = ctx.update.message?.text;
