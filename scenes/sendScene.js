@@ -5,7 +5,11 @@ const { getWalletById } = require("../utils/walletUtils");
 const step1 = async (ctx) => {
   const wallet = await getWalletById(ctx.session.loggedInWalletId);
   if (wallet.state.status !== "ready") {
-    await ctx.deleteMessage();
+    try {
+      await ctx.deleteMessage();
+    } catch (error) {
+      console.log(error);
+    }
     await ctx.reply(
       `Your wallet is syncing.
 Please Wait for it to finish before trying to send...

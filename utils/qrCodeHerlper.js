@@ -62,7 +62,11 @@ const generateQrFileId = async (ctx, data, image) => {
   const message = await bot.telegram.sendPhoto("-1001647697690", {
     source: qrBuff,
   });
-  await bot.telegram.deleteMessage(message.chat.id, message.message_id);
+  try {
+    await bot.telegram.deleteMessage(message.chat.id, message.message_id);
+  } catch (error) {
+    console.log(error);
+  }
   ctx.session.qrCache[data] = message.photo[message.photo.length - 1].file_id;
   return ctx.session.qrCache[data];
 };

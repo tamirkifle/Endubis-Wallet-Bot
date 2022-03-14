@@ -206,7 +206,11 @@ step5.action("refresh-txn", async (ctx) => {
     ctx.scene.state.transaction.id
   ); //refresh txn
   const { transaction } = ctx.scene.state;
-  await ctx.deleteMessage();
+  try {
+    await ctx.deleteMessage();
+  } catch (error) {
+    console.log(error);
+  }
   if (transaction.status === "in_ledger") {
     await ctx.reply(
       `Transaction Details:\n${formatTxnData(transaction)}`,
