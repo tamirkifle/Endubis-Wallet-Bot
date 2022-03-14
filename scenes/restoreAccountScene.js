@@ -39,7 +39,9 @@ step2.on("text", async (ctx) => {
   const id = await idFromSeed(ctx.scene.state.seedPhrases);
   const existingWallet = await getWalletById(id);
   if (existingWallet) {
-    await ctx.reply("Wallet already exists in database. Loading the wallet.");
+    await ctx.reply(
+      "Wallet already exists in our database. Loading the wallet."
+    );
     ctx.session.loggedInWalletId = id;
     const userInfo = await bot.telegram.getChat(existingWallet.name);
     ctx.session.userInfo = userInfo;
