@@ -10,7 +10,7 @@ const step1 = (ctx) => {
       [Markup.button.callback("By Time Frame 🕒", "txns-by-time")],
       [Markup.button.callback("Sent 🔺", "txns-sent")],
       [Markup.button.callback("Received 🟢", "txns-received")],
-      [Markup.button.callback("All transactions", "txns-all")],
+      [Markup.button.callback("All transactions 📜", "txns-all")],
       [mainMenuButton()],
     ])
   );
@@ -34,6 +34,7 @@ step2.action("txns-by-time", (ctx) => {
   ctx.reply(
     `Choose time frame to see transactions`,
     Markup.inlineKeyboard([
+      [Markup.button.callback("Past week", "txns-past-week")],
       [Markup.button.callback("Past month", "txns-past-month")],
       [Markup.button.callback("Past 3 months", "txns-past-3-months")],
       [Markup.button.callback("Past 6 months", "txns-past-6-months")],
@@ -113,6 +114,9 @@ ${formatTxnData(txn)}`,
 
 const step3 = new Composer();
 step3.action("txns-all-time", (ctx) => txnListHandler(ctx));
+step3.action("txns-past-week", (ctx) =>
+  txnListHandler(ctx, { months: 7 / 30 })
+);
 step3.action("txns-past-month", (ctx) => txnListHandler(ctx, { months: 1 }));
 step3.action("txns-past-3-months", (ctx) => txnListHandler(ctx, { months: 3 }));
 step3.action("txns-past-6-months", (ctx) => txnListHandler(ctx, { months: 6 }));
