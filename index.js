@@ -55,6 +55,16 @@ const localSession = new LocalSession({
 bot.use(localSession.middleware());
 bot.use(stage.middleware());
 
+bot.on("inline_query", (ctx, next) => {
+  if (!ctx.session.loggedInWalletId) {
+    ctx.answerInlineQuery([], {
+      switch_pm_text: "Start using Endubis Wallet",
+      switch_pm_parameter: "go-to-wallet",
+    });
+  } else {
+    next();
+  }
+});
 bot.inlineQuery("s", sHandler);
 bot.inlineQuery("qr", qrHandler);
 bot.inlineQuery(/(\d+.?\d*)/, generalWithAmountHandler);

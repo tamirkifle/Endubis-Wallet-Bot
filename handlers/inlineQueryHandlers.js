@@ -3,18 +3,12 @@ const { getReceivingAddress } = require("../utils/walletUtils");
 const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 const sHandler = (ctx) => {
-  const results = [];
-  ctx.answerInlineQuery(results, {
-    switch_pm_text: "Send using Wallet",
+  ctx.answerInlineQuery([], {
+    switch_pm_text: "Send using Endubis Wallet",
     switch_pm_parameter: "send",
   });
 };
 const qrHandler = async (ctx) => {
-  if (!ctx.session.loggedInWalletId) {
-    // Handle new users using inline mode
-    return;
-  }
-
   const startPayload = Buffer.from(
     `sendto=${ctx.session.userInfo?.id}`
   ).toString("base64");
@@ -47,11 +41,6 @@ const qrHandler = async (ctx) => {
 };
 
 const generalInlineHandler = async (ctx) => {
-  if (!ctx.session.loggedInWalletId) {
-    // Handle new users using inline mode
-    return;
-  }
-
   const address = await getReceivingAddress(ctx.session.loggedInWalletId);
   const startPayload = Buffer.from(
     `sendto=${ctx.session.userInfo?.id}`
@@ -101,11 +90,6 @@ const generalInlineHandler = async (ctx) => {
 };
 
 const generalWithAmountHandler = async (ctx) => {
-  if (!ctx.session.loggedInWalletId) {
-    // Handle new users using inline mode
-    return;
-  }
-
   if (Number(ctx.match[1])) {
     const amountToSend = Number(ctx.match[1]);
     const startPayload = Buffer.from(

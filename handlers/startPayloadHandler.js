@@ -9,12 +9,12 @@ const startPayloadHandler = async (ctx, next) => {
   }
   const decodedPayload = Buffer.from(ctx.startPayload, "base64").toString();
 
-  if (ctx.startPayload === "send") {
-    //switch_pm_parameter
-    if (!ctx.session.loggedInWalletId) {
-      return mainMenuHandler(ctx);
-    }
-    Scenes.Stage.enter("sendScene")(ctx);
+  if (ctx.startPayload === "go-to-wallet") {
+    //switch_pm_parameter go-to-wallet
+    return mainMenuHandler(ctx);
+  } else if (ctx.startPayload === "send") {
+    //switch_pm_parameter send
+    return Scenes.Stage.enter("sendScene")(ctx);
   } else if (decodedPayload.match(/^sendto[=-](.+)/)) {
     //matches sendto with and without amount and expiry
     if (!ctx.session.loggedInWalletId) {
@@ -46,7 +46,7 @@ const startPayloadHandler = async (ctx, next) => {
       ctx.session.expiryTime = null; //no expiry
       ctx.session.amountToSend = null;
     }
-    Scenes.Stage.enter("sendToUserIdScene")(ctx);
+    return Scenes.Stage.enter("sendToUserIdScene")(ctx);
   } else {
     //if it's not an inline-querty switch-pm and there is a payload, then it is a referral code
     //TODO: Handle Referrals
