@@ -21,28 +21,19 @@ const startPayloadHandler = async (ctx, next) => {
       await ctx.reply("You are not logged in.");
       return mainMenuHandler(ctx);
     }
-    if (decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)) {
-      ctx.session.toSendUserId = decodedPayload.match(
-        /^sendto[=-](.+)&amount=(.+)&expiry=(.+)/
-      )[1];
-      ctx.session.amountToSend = decodedPayload.match(
-        /^sendto[=-](.+)&amount=(.+)&expiry=(.+)/
-      )[2];
-      ctx.session.expiryTime =
-        1 * 3600000 +
-        Number(
-          decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/)[3]
-        ); //1 hour expiry
-    } else if (decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)) {
-      ctx.session.toSendUserId = decodedPayload.match(
-        /^sendto[=-](.+)&expiry=(.+)/
-      )[1];
-      ctx.session.expiryTime =
-        1 * 3600000 +
-        Number(decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/)[2]); //1 hour expiry
+    if (
+      (match = decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/))
+    ) {
+      ctx.session.toSendUserId = match[1];
+      ctx.session.amountToSend = match[2];
+      ctx.session.expiryTime = 1 * 3600000 + Number(match[3]); //1 hour expiry
+    } else if ((match = decodedPayload.match(/^sendto[=-](.+)&expiry=(.+)/))) {
+      ctx.session.toSendUserId = match[1];
+      ctx.session.expiryTime = 1 * 3600000 + Number(match[2]); //1 hour expiry
       ctx.session.amountToSend = null;
     } else {
-      ctx.session.toSendUserId = decodedPayload.match(/^sendto[=-](.+)/)[1];
+      match = decodedPayload.match(/^sendto[=-](.+)/);
+      ctx.session.toSendUserId = match[1];
       ctx.session.expiryTime = null; //no expiry
       ctx.session.amountToSend = null;
     }
