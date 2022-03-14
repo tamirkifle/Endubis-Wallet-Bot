@@ -26,11 +26,11 @@ Step 1
 - Take userid from session and ask for amount
 */
 const step1 = async (ctx) => {
-  if (ctx.session?.expiryTime && Date.now() > Number(ctx.session.expiryTime)) {
+  if (ctx.session.expiryTime && Date.now() > Number(ctx.session.expiryTime)) {
     //EXPIRED
     await replyMenu(ctx, "Sorry. The button you clicked has expired.");
     return ctx.scene.leave();
-  } else if (ctx.session?.expiryTime) {
+  } else if (ctx.session.expiryTime) {
     ctx.replyWithHTML(
       `<i><b>Note: Link expires in 00:${String(
         Math.floor((ctx.session.expiryTime - Date.now()) / 60000)
@@ -44,14 +44,18 @@ const step1 = async (ctx) => {
     );
   }
   try {
-    const toSendId = ctx.session?.toSendUserId;
+    const toSendId = ctx.session.toSendUserId;
     const walletToSendTo = await getWalletByName(String(toSendId));
     const addresses = await walletToSendTo.getUnusedAddresses();
     ctx.scene.state.receiverAddress = addresses.slice(0, 1)[0];
-    const chat = await bot.telegram.getChat(toSendId);
+    const userInfo = await bot.telegram.getChat(toSendId);
     if (ctx.session.amountToSend) {
       await ctx.replyWithHTML(
-        `User <a href="tg://user?id=${toSendId}">@${chat.username} (${chat.first_name} ${chat.last_name})</a> was found in our database.`
+        `User <a href="tg://user?id=${toSendId}">${
+          userInfo.username ? `@` + userInfo.username + ` - ` : ``
+        }${userInfo.first_name}${
+          userInfo.last_name ? ` ` + userInfo.last_name : ``
+        }</a> was found in our database.`
       );
       ctx.scene.state.amount = ctx.session.amountToSend;
       amountHandler()(ctx);
@@ -59,7 +63,11 @@ const step1 = async (ctx) => {
     } else {
       await replyMenuHTML(
         ctx,
-        `User <a href="tg://user?id=${toSendId}">@${chat.username} (${chat.first_name} ${chat.last_name})</a> was found in our database.\nPlease enter the amount to send (in ada)`
+        `User <a href="tg://user?id=${toSendId}">${
+          userInfo.username ? `@` + userInfo.username + ` - ` : ``
+        }(${userInfo.first_name}${
+          userInfo.last_name ? ` ` + userInfo.last_name : ``
+        })</a> was found in our database.\nPlease enter the amount to send (in ada)`
       );
       return ctx.wizard.next();
     }
@@ -88,7 +96,7 @@ const amountHandler = () => {
       );
       return;
     }
-    ctx.scene.state.wallet = await getWalletById(ctx.session?.loggedInWalletId);
+    ctx.scene.state.wallet = await getWalletById(ctx.session.loggedInWalletId);
     const { wallet } = ctx.scene.state;
     try {
       const estimatedFees = await wallet.estimateFee(
@@ -110,7 +118,7 @@ Est. Fees: ${estimatedFees.estimated_min.quantity / 1000000} ada - ${
           ])
         );
       }
-      if (ctx.session?.amountToSend) {
+      if (ctx.session.amountToSend) {
         return ctx.wizard.selectStep(ctx.wizard.cursor + 2);
       }
       return ctx.wizard.next();
@@ -150,7 +158,7 @@ step4.start(mainMenuHandler);
 step4.hears("🏠 Main Menu", mainMenuHandler);
 
 step4.on("text", async (ctx) => {
-  const passphrase = ctx.update.message?.text;
+  const passphrase = ctx.message?.text;
   if (!(ctx.scene.state.wallet instanceof ShelleyWallet)) {
     ctx.scene.state.wallet = makeShelleyWallet(ctx.scene.state.wallet);
   }

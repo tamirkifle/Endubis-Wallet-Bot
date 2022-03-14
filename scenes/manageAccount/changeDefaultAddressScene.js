@@ -7,7 +7,7 @@ Step 1
 - List addresses in buttons and ask user to select default address
 */
 const step1 = async (ctx) => {
-  const wallet = await getWalletById(ctx.session?.loggedInWalletId);
+  const wallet = await getWalletById(ctx.session.loggedInWalletId);
   const addresses = await getAddresses(wallet);
   console.log({ addresses });
   ctx.reply(

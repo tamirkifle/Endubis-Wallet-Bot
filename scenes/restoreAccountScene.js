@@ -8,6 +8,8 @@ const {
   getWalletById,
 } = require("../utils/loadAccount");
 
+const bot = require("../botSession");
+
 /*
 Step 1: 
 - Ask user for the seed phrase (with an option to cancel and go back to the main menu)
@@ -40,6 +42,8 @@ step2.on("text", async (ctx) => {
   if (existingWallet) {
     await ctx.reply("Wallet already exists in database. Loading the wallet.");
     ctx.session.loggedInWalletId = id;
+    const userInfo = await bot.telegram.getChat(existingWallet.name);
+    ctx.session.userInfo = userInfo;
     return mainMenuHandler(ctx);
   }
   replyMenu(
@@ -82,6 +86,11 @@ step3.on("text", async (ctx) => {
       String(ctx.from.id)
     );
     ctx.session.loggedInWalletId = wallet.id;
+    const userInfo = await bot.telegram.getChat(wallet.name);
+    ctx.session.userInfo = userInfo;
+
+    const bot = require("../botSession");
+    const chat = await bot.telegram.getChat(wallet.name);
     await ctx.reply(`Weclcome to your account\n`);
     mainMenuHandler(ctx);
   } catch (e) {

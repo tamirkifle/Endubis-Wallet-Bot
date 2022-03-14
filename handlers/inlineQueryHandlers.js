@@ -10,19 +10,21 @@ const sHandler = (ctx) => {
   });
 };
 const qrHandler = async (ctx) => {
-  if (!ctx.session?.loggedInWalletId) {
+  if (!ctx.session.loggedInWalletId) {
     // Handle new users using inline mode
     return;
   }
-  const wallet = await getWalletById(ctx.session.loggedInWalletId);
-  const bot = require("../botSession");
-  const chat = await bot.telegram.getChat(wallet.name);
 
-  const startPayload = Buffer.from(`sendto=${chat.id}`).toString("base64");
+  const startPayload = Buffer.from(
+    `sendto=${ctx.session.userInfo?.id}`
+  ).toString("base64");
   const file_id = await generateQrFileId(
     ctx,
     `http://t.me/Testing_TM_Bot?start=${startPayload}`
   );
+  const userLink = ctx.session.userInfo?.username
+    ? `http://t.me/${ctx.session.userInfo?.username}`
+    : `tg://user?id=${ctx.session.userInfo?.id}`;
   const results = [
     {
       type: "photo",
@@ -31,7 +33,15 @@ const qrHandler = async (ctx) => {
       title: `Send a payment QR Code`,
       description:
         "Send a message with a QR Code for receiving payments to your address",
-      caption: `Send to <b>@${chat.username}</b>(<b>${chat.first_name} ${chat.last_name}</b>)`,
+      caption: `Send to <a href="${userLink}"><b>${
+        ctx.session.userInfo?.username
+          ? `@` + ctx.session.userInfo?.username + ` - `
+          : ``
+      }${ctx.session.userInfo?.first_name}${
+        ctx.session.userInfo?.last_name
+          ? ` ` + ctx.session.userInfo?.last_name
+          : ``
+      }</b></a>`,
       parse_mode: "HTML",
     },
   ];
@@ -39,16 +49,15 @@ const qrHandler = async (ctx) => {
 };
 
 const generalInlineHandler = async (ctx) => {
-  if (!ctx.session?.loggedInWalletId) {
+  if (!ctx.session.loggedInWalletId) {
     // Handle new users using inline mode
     return;
   }
-  const wallet = await getWalletById(ctx.session.loggedInWalletId);
-  const bot = require("../botSession");
-  const chat = await bot.telegram.getChat(wallet.name);
 
-  const address = await getReceivingAddress(ctx.session?.loggedInWalletId);
-  const startPayload = Buffer.from(`sendto=${chat.id}`).toString("base64");
+  const address = await getReceivingAddress(ctx.session.loggedInWalletId);
+  const startPayload = Buffer.from(
+    `sendto=${ctx.session.userInfo?.id}`
+  ).toString("base64");
   const results = [
     {
       type: "article",
@@ -67,7 +76,17 @@ const generalInlineHandler = async (ctx) => {
       description:
         "Send a message with a link to the wallet with your contact pre-filled",
       input_message_content: {
-        message_text: `Send to <b>@${chat.username}</b> (<b>${chat.first_name} ${chat.last_name}</b>)`,
+        message_text: `Send to <a href="tg://user?id=${
+          ctx.session.userInfo?.id
+        }"><b>${
+          ctx.session.userInfo?.username
+            ? `@` + ctx.session.userInfo?.username + ` - `
+            : ``
+        }${ctx.session.userInfo?.first_name}${
+          ctx.session.userInfo?.last_name
+            ? ` ` + ctx.session.userInfo?.last_name
+            : ``
+        }</b></a>`,
         parse_mode: "HTML",
       },
       ...Markup.inlineKeyboard([
@@ -84,20 +103,19 @@ const generalInlineHandler = async (ctx) => {
 };
 
 const generalWithAmountHandler = async (ctx) => {
-  if (!ctx.session?.loggedInWalletId) {
+  if (!ctx.session.loggedInWalletId) {
     // Handle new users using inline mode
     return;
   }
-  const wallet = await getWalletById(ctx.session.loggedInWalletId);
-  const bot = require("../botSession");
-  const chat = await bot.telegram.getChat(wallet.name);
 
   if (Number(ctx.match[1])) {
     const amountToSend = Number(ctx.match[1]);
     const startPayload = Buffer.from(
-      `sendto=${chat.id}&amount=${amountToSend}&expiry=${Date.now()}`
+      `sendto=${
+        ctx.session.userInfo?.id
+      }&amount=${amountToSend}&expiry=${Date.now()}`
     ).toString("base64");
-    const address = await getReceivingAddress(ctx.session?.loggedInWalletId);
+    const address = await getReceivingAddress(ctx.session.loggedInWalletId);
     const results = [
       {
         type: "article",
@@ -116,14 +134,26 @@ const generalWithAmountHandler = async (ctx) => {
         description:
           "Send a message with a link to the wallet with your contact pre-filled",
         input_message_content: {
-          message_text: `<b>@${chat.username}</b> (<b>${chat.first_name} ${chat.last_name}</b>) has requested <i><b>${amountToSend} ada</b></i>
+          message_text: `<a href="tg://user?id=${ctx.session.userInfo?.id}">${
+            ctx.session.userInfo?.username
+              ? `@` + ctx.session.userInfo?.username + ` - `
+              : ``
+          }${ctx.session.userInfo?.first_name}${
+            ctx.session.userInfo?.last_name
+              ? ` ` + ctx.session.userInfo?.last_name
+              : ``
+          }</a> has requested <i><b>${amountToSend} ada</b></i>
 <i>Note: The payment button below expires after one hour</i>`,
           parse_mode: "HTML",
         },
         ...Markup.inlineKeyboard([
           [
             Markup.button.url(
-              `Send ${amountToSend} ada to @${chat.username}`,
+              `Send ${amountToSend} ada to ${
+                ctx.session.userInfo?.username
+                  ? `@` + ctx.session.userInfo?.username
+                  : ctx.session.userInfo?.first_name
+              }`,
               `http://t.me/Testing_TM_Bot?start=${startPayload}`
             ),
           ],

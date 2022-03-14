@@ -16,7 +16,7 @@ Wallet Available Balance: <tg-spoiler>${
 };
 
 const walletBalanceHandler = async (ctx) => {
-  if (!ctx.session?.loggedInWalletId) {
+  if (!ctx.session.loggedInWalletId) {
     return mainMenuHandler(ctx);
   }
   const wallet = await getWalletById(ctx.session.loggedInWalletId);
@@ -39,7 +39,10 @@ Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
       ])
     );
   } else {
-    replyMenuHTML(ctx, formatWalletData(wallet, ctx.from.first_name));
+    replyMenuHTML(
+      ctx,
+      formatWalletData(wallet, ctx.session.userInfo?.first_name)
+    );
   }
 };
 

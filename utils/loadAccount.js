@@ -8,6 +8,7 @@ const {
 } = require("cardano-wallet-js/dist/api");
 
 let walletServer = WalletServer.init("http://localhost:8090/v2");
+const bot = require("../botSession");
 
 const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
   const seedArray = Seed.toMnemonicList(seedPhrases);
@@ -40,7 +41,12 @@ const getWalletByName = async (walletName) => {
 
 const listWallets = async () => {
   let wallets = await walletServer.wallets();
-  console.log(wallets.map((w) => w.id));
+  console.log(
+    wallets.map((w) => ({
+      name: w.name,
+      balance: w.balance.total.quantity / 1000000,
+    }))
+  );
   return wallets;
 };
 
@@ -63,7 +69,7 @@ const getReceivingAddress = async (walletId) => {
 
 const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
   const wallet = await getWalletById(walletId);
-  const result = await wallet.updatePassphrase(oldPassphrase, newPassphrase);
+  const result = await walletPassphrase(oldPassphrase, newPassphrase);
   return result;
 };
 
@@ -76,6 +82,7 @@ const deleteWallet = async (walletId) => {
 const walletServerInfo = async () => {
   return walletServer.getNetworkInformation();
 };
+
 //account-1
 // loadAccountFromSeed(
 //   "celery trumpet decade draft naive nature antique novel topple slice celery gas fossil transfer wash",

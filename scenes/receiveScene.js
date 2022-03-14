@@ -4,7 +4,7 @@ const {
   replyMenuHTML,
   replyMenuPhoto,
 } = require("../utils/btnMenuHelpers");
-const { getReceivingAddress } = require("../utils/loadAccount");
+const { getReceivingAddress, getWalletById } = require("../utils/loadAccount");
 const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 // TODO: Generate QR Code
@@ -34,13 +34,26 @@ step2.action("receiving-address", async (ctx) => {
   return ctx.scene.leave();
 });
 step2.action("receiving-qr", async (ctx) => {
-  const startPayload = Buffer.from(`sendto=${ctx.from.id}`).toString("base64");
+  const startPayload = Buffer.from(
+    `sendto=${ctx.session.userInfo?.id}`
+  ).toString("base64");
   const file_id = await generateQrFileId(
     ctx,
     `http://t.me/Testing_TM_Bot?start=${startPayload}`
   );
+  const userLink = ctx.session.userInfo?.username
+    ? `http://t.me/${ctx.session.userInfo?.username}`
+    : `tg://user?id=${ctx.session.userInfo?.id}`;
   await replyMenuPhoto(ctx, file_id, {
-    caption: `<b>@${ctx.from.username}</b>(<b>${ctx.from.first_name} ${ctx.from.last_name}</b>)`,
+    caption: `Send to <a href="${userLink}"><b>${
+      ctx.session.userInfo?.username
+        ? `@` + ctx.session.userInfo?.username + ` - `
+        : ``
+    }${ctx.session.userInfo?.first_name}${
+      ctx.session.userInfo?.last_name
+        ? ` ` + ctx.session.userInfo?.last_name
+        : ``
+    }</b></a>`,
     parse_mode: "HTML",
   });
   return ctx.scene.leave();

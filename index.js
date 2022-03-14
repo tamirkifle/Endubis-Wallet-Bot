@@ -73,6 +73,7 @@ bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", (ctx) => {
   ctx.session.loggedInWalletId = null;
+  ctx.session.userInfo = null;
   ctx.deleteMessage();
   mainMenuHandler(ctx);
 });

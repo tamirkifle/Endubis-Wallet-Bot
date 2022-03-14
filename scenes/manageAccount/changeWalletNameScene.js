@@ -10,7 +10,7 @@ Step 1
 */
 let wallet = {};
 const step1 = async (ctx) => {
-  wallet = await getWalletById(ctx.session?.loggedInWalletId);
+  wallet = await getWalletById(ctx.session.loggedInWalletId);
   replyMenuHTML(
     ctx,
     `Your current wallet name is: <b>${wallet.name}</b>\n\nPlease enter the new wallet name you'd like to change this into`
@@ -27,7 +27,7 @@ step2.start(mainMenuHandler);
 step2.hears("🏠 Main Menu", mainMenuHandler);
 
 step2.on("text", async (ctx) => {
-  const newWalletName = ctx.update.message?.text;
+  const newWalletName = ctx.message?.text;
   try {
     await wallet.rename(newWalletName);
     replyMenuHTML(

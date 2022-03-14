@@ -43,7 +43,7 @@ Step 2
 */
 
 const txnListHandler = async (ctx, monthsOfTxns) => {
-  const wallet = await getWalletById(ctx.session?.loggedInWalletId);
+  const wallet = await getWalletById(ctx.session.loggedInWalletId);
   const oneMonthInMS = 2629800000;
   const endDate = new Date(Date.now());
   const startDate = new Date(Date.now() - oneMonthInMS * monthsOfTxns);

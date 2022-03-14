@@ -11,13 +11,13 @@ const startPayloadHandler = async (ctx, next) => {
 
   if (ctx.startPayload === "send") {
     //switch_pm_parameter
-    if (!ctx.session?.loggedInWalletId) {
+    if (!ctx.session.loggedInWalletId) {
       return mainMenuHandler(ctx);
     }
     Scenes.Stage.enter("sendScene")(ctx);
   } else if (decodedPayload.match(/^sendto[=-](.+)/)) {
     //matches sendto with and without amount and expiry
-    if (!ctx.session?.loggedInWalletId) {
+    if (!ctx.session.loggedInWalletId) {
       await ctx.reply("You are not logged in.");
       return mainMenuHandler(ctx);
     }

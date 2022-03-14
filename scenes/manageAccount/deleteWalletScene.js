@@ -35,8 +35,9 @@ const step2 = new Composer();
 step2.hears("✅ Yes", async (ctx) => {
   await ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
   try {
-    const result = await deleteWallet(ctx.session?.loggedInWalletId);
+    const result = await deleteWallet(ctx.session.loggedInWalletId);
     ctx.session.loggedInWalletId = null;
+    ctx.session.userInfo = null;
     console.log(result);
     replyMenu(ctx, "Wallet Successfully Deleted");
   } catch (e) {

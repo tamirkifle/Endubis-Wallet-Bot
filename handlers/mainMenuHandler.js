@@ -5,20 +5,15 @@ const mainMenuHandler = async (ctx) => {
   ctx.scene?.leave();
 
   // await ctx.deleteMessage(goingMsg.from.id, goingMsg.message_id);
-  if (ctx.session?.loggedInWalletId) {
-    const userFirstName =
-      ctx.update?.message?.from?.first_name ??
-      ctx.update?.callback_query?.from?.first_name;
-    const userId =
-      ctx.update?.message?.from?.id ?? ctx.update?.callback_query?.from?.id;
-    if (ctx.update.message?.text === "/start") {
+  if (ctx.session.loggedInWalletId) {
+    if (ctx.message?.text === "/start") {
       await ctx.reply(
         "👋 Welcome back to your wallet",
         Markup.keyboard([["🏠 Main Menu"]]).resize()
       );
     }
     return ctx.replyWithHTML(
-      `Please choose an option, <a href="tg://user?id=${userId}">${userFirstName}</a>`,
+      `Please choose an option, <a href="tg://user?id=${ctx.session.userInfo?.id}">${ctx.session.userInfo?.first_name}</a>`,
       Markup.inlineKeyboard([
         [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
         [

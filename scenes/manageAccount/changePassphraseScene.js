@@ -32,14 +32,14 @@ step2.start(mainMenuHandler);
 step2.hears("🏠 Main Menu", mainMenuHandler);
 
 step2.on("text", (ctx) => {
-  if (ctx.update.message?.text.length < 10) {
+  if (ctx.message?.text.length < 10) {
     replyMenu(
       ctx,
       "Passphrase can't be less than 10 characters long. Try again."
     );
     return;
   }
-  oldPass = ctx.update.message?.text;
+  oldPass = ctx.message?.text;
   replyMenu(ctx, `Please enter your desired new passphrase`);
   return ctx.wizard.next();
   // return ctx.scene.leave();
@@ -57,9 +57,9 @@ step3.hears("🏠 Main Menu", mainMenuHandler);
 
 let newPass;
 step3.on("text", (ctx) => {
-  console.log("New Passphrase reply: ", ctx.update.message?.text);
-  newPass = ctx.update.message?.text;
-  if (ctx.update.message?.text.length < 10) {
+  console.log("New Passphrase reply: ", ctx.message?.text);
+  newPass = ctx.message?.text;
+  if (ctx.message?.text.length < 10) {
     replyMenu(
       ctx,
       "Passphrase can't be less than 10 characters long. Try again."
@@ -85,12 +85,8 @@ step4.start(mainMenuHandler);
 step4.hears("🏠 Main Menu", mainMenuHandler);
 
 step4.on("text", async (ctx) => {
-  console.log("Repeat Passphrase reply: ", ctx.update.message?.text);
-  if (
-    !newPass ||
-    !ctx.update.message?.text ||
-    newPass !== ctx.update.message?.text
-  ) {
+  console.log("Repeat Passphrase reply: ", ctx.message?.text);
+  if (!newPass || !ctx.message?.text || newPass !== ctx.message?.text) {
     replyMenu(
       ctx,
       `The passwords don't match. Please try again.\n\nEnter your desired new passphrase`
@@ -99,7 +95,7 @@ step4.on("text", async (ctx) => {
   }
   try {
     const result = await changePassphrase(
-      ctx.session?.loggedInWalletId,
+      ctx.session.loggedInWalletId,
       oldPass,
       newPass
     );

@@ -18,7 +18,7 @@ Step 3
   step3.hears("🏠 Main Menu", mainMenuHandler);
 
   step3.on("text", async (ctx) => {
-    ctx.scene.state.amount = Number(ctx.update.message?.text) * 1000000; //to lovelace
+    ctx.scene.state.amount = Number(ctx.message?.text) * 1000000; //to lovelace
     const { amount, receiverAddress } = ctx.scene.state;
     if (!amount) {
       replyMenu(
@@ -27,7 +27,7 @@ Step 3
       );
       return;
     }
-    ctx.scene.state.wallet = await getWalletById(ctx.session?.loggedInWalletId);
+    ctx.scene.state.wallet = await getWalletById(ctx.session.loggedInWalletId);
     const { wallet } = ctx.scene.state;
     try {
       const estimatedFees = await wallet.estimateFee(
@@ -83,7 +83,7 @@ Step 5
   step5.hears("🏠 Main Menu", mainMenuHandler);
 
   step5.on("text", async (ctx) => {
-    const passphrase = ctx.update.message?.text;
+    const passphrase = ctx.message?.text;
     if (!(ctx.scene.state.wallet instanceof ShelleyWallet)) {
       ctx.scene.state.wallet = makeShelleyWallet(ctx.scene.state.wallet);
     }
