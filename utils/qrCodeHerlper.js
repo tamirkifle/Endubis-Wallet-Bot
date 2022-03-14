@@ -3,17 +3,8 @@ const {
 } = require("qr-code-styling-node/lib/qr-code-styling.common.js");
 // const QRCode = require("qrcode");
 const nodeCanvas = require("canvas");
-const fs = require("fs").promises;
-const { Telegraf } = require("telegraf");
 
-require("dotenv").config();
-
-const token = process.env.TG_BOT_TOKEN;
-if (token === undefined) {
-  throw new Error("TG_BOT_TOKEN must be provided!");
-}
-
-const bot = new Telegraf(token);
+const bot = require("../botSession");
 
 const generateQr = (data, image = "https://svgshare.com/i/f84.svg") => {
   const obj = {

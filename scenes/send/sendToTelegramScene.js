@@ -4,13 +4,8 @@ const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 const { sendCommonSteps } = require("./sendCommonSteps");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
-require("dotenv").config();
-const token = process.env.TG_BOT_TOKEN;
-if (token === undefined) {
-  throw new Error("TG_BOT_TOKEN must be provided!");
-}
+const bot = require("../../botSession");
 
-const bot = new Telegraf(token);
 /* 
 Step 1
 - Ask for telegram username

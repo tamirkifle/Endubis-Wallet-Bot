@@ -1,6 +1,6 @@
-const { Telegraf, Markup, Scenes } = require("telegraf");
+const { Scenes } = require("telegraf");
 const LocalSession = require("telegraf-session-local");
-const CryptoJS = require("crypto-js");
+// const CryptoJS = require("crypto-js");
 const { telegrafThrottler } = require("telegraf-throttler");
 
 const { createAccountScene } = require("./scenes/createAccountScene");
@@ -28,14 +28,8 @@ const {
 const { startPayloadHandler } = require("./handlers/startPayloadHandler");
 const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
 
-require("dotenv").config();
+const bot = require("./botSession");
 
-const token = process.env.TG_BOT_TOKEN;
-if (token === undefined) {
-  throw new Error("TG_BOT_TOKEN must be provided!");
-}
-
-const bot = new Telegraf(token);
 const throttler = telegrafThrottler();
 bot.use(throttler);
 const stage = new Scenes.Stage([
@@ -69,9 +63,8 @@ bot.on("inline_query", generalInlineHandler);
 
 bot.start(startPayloadHandler, mainMenuHandler);
 bot.hears("🏠 Main Menu", mainMenuHandler);
-// bot.start(mainMenuHandler);
-bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 
+bot.action("create-wallet", Scenes.Stage.enter("createAccountScene"));
 bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action(["wallet-balance", "refresh-balance"], walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
