@@ -1,12 +1,11 @@
-const { Scenes, Markup, Composer } = require("telegraf");
+const { Scenes, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
-const { walletBalanceHandler } = require("../handlers/walletBalanceHandler");
 const { replyMenu, replyMenuHTML } = require("../utils/btnMenuHelpers");
 const {
   loadAccountFromSeed,
   idFromSeed,
   getWalletById,
-} = require("../utils/loadAccount");
+} = require("../utils/walletUtils");
 
 const bot = require("../botSession");
 

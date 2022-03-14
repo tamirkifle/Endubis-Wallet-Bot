@@ -1,5 +1,5 @@
 const { Composer, Markup } = require("telegraf");
-const { getWalletById, makeShelleyWallet } = require("../../utils/loadAccount");
+const { getWalletById, makeShelleyWallet } = require("../../utils/walletUtils");
 const { replyMenu, mainMenuButton } = require("../../utils/btnMenuHelpers");
 const { formatTxnData } = require("../../utils/formatTxnData");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");

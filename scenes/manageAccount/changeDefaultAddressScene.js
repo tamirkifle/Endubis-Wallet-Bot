@@ -1,6 +1,5 @@
-const { Scenes, Composer, Markup } = require("telegraf");
-const { getWalletById, getAddresses } = require("../../utils/loadAccount");
-const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
+const { Scenes, Markup } = require("telegraf");
+const { getWalletById, getAddresses } = require("../../utils/walletUtils");
 
 /* 
 Step 1

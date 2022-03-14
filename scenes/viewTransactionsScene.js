@@ -1,10 +1,6 @@
 const { Scenes, Composer, Markup } = require("telegraf");
-const { getWalletById } = require("../utils/loadAccount");
-const {
-  replyMenu,
-  replyMenuHTML,
-  mainMenuButton,
-} = require("../utils/btnMenuHelpers");
+const { getWalletById } = require("../utils/walletUtils");
+const { mainMenuButton } = require("../utils/btnMenuHelpers");
 const { formatTxnData } = require("../utils/formatTxnData");
 
 const step1 = (ctx) => {

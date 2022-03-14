@@ -1,10 +1,6 @@
 const { Scenes, Composer, Markup } = require("telegraf");
-const {
-  mainMenuButton,
-  replyMenuHTML,
-  replyMenu,
-} = require("../utils/btnMenuHelpers");
-const { getWalletById } = require("../utils/loadAccount");
+const { mainMenuButton } = require("../utils/btnMenuHelpers");
+const { getWalletById } = require("../utils/walletUtils");
 
 const step1 = async (ctx) => {
   const wallet = await getWalletById(ctx.session.loggedInWalletId);

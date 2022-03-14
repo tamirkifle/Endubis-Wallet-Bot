@@ -15,7 +15,7 @@ const step1 = (ctx) => {
 Write the mnemonic phrase down and keep it safe from prying eyes, you will need it to access your wallet. 
 <b>Don’t copy it to your clipboard or save it anywhere online.</b>`,
     Markup.inlineKeyboard([
-      [Markup.button.callback("Show seed phrase", "generate-seed")],
+      [Markup.button.callback("Generate seed phrase", "generate-seed")],
       [mainMenuButton()],
     ])
   );

@@ -1,5 +1,5 @@
 const { Scenes, Composer } = require("telegraf");
-const { getWalletById } = require("../../utils/loadAccount");
+const { getWalletById } = require("../../utils/walletUtils");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 

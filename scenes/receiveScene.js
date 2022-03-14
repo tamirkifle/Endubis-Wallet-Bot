@@ -4,7 +4,7 @@ const {
   replyMenuHTML,
   replyMenuPhoto,
 } = require("../utils/btnMenuHelpers");
-const { getReceivingAddress, getWalletById } = require("../utils/loadAccount");
+const { getReceivingAddress } = require("../utils/walletUtils");
 const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 // TODO: Generate QR Code

@@ -1,5 +1,5 @@
-const { Scenes, Composer, Telegraf } = require("telegraf");
-const { listWallets, getWalletByName } = require("../../utils/loadAccount");
+const { Scenes, Composer } = require("telegraf");
+const { listWallets, getWalletByName } = require("../../utils/walletUtils");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 const { sendCommonSteps } = require("./sendCommonSteps");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");

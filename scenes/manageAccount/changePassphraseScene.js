@@ -1,5 +1,5 @@
-const { Scenes, Markup, Composer } = require("telegraf");
-const { changePassphrase } = require("../../utils/loadAccount");
+const { Scenes, Composer } = require("telegraf");
+const { changePassphrase } = require("../../utils/walletUtils");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 

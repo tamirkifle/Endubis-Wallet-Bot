@@ -1,5 +1,5 @@
 const { Markup } = require("telegraf");
-const { getReceivingAddress, getWalletById } = require("../utils/loadAccount");
+const { getReceivingAddress } = require("../utils/walletUtils");
 const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 const sHandler = (ctx) => {

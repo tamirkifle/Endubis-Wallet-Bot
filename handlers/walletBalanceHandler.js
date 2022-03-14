@@ -1,6 +1,6 @@
 const { Markup } = require("telegraf");
 const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
-const { getWalletById } = require("../utils/loadAccount");
+const { getWalletById } = require("../utils/walletUtils");
 const { mainMenuHandler } = require("./mainMenuHandler");
 
 const formatWalletDataHTML = (wallet, name) => {

@@ -3,7 +3,7 @@ const {
   getWalletByName,
   getWalletById,
   makeShelleyWallet,
-} = require("../../utils/loadAccount");
+} = require("../../utils/walletUtils");
 const {
   replyMenu,
   replyMenuHTML,
