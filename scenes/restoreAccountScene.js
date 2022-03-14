@@ -90,12 +90,14 @@ step3.on("text", async (ctx) => {
     const userInfo = await bot.telegram.getChat(wallet.name);
     ctx.session.userInfo = userInfo;
 
-    const bot = require("../botSession");
-    const chat = await bot.telegram.getChat(wallet.name);
     await ctx.reply(`Weclcome to your account\n`);
     mainMenuHandler(ctx);
   } catch (e) {
-    replyMenuHTML(ctx, `🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
+    if (e.response?.data?.message) {
+      replyMenuHTML(ctx, `🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
+    } else {
+      replyMenuHTML(ctx, `🔴 <b>ERROR</b>`);
+    }
   }
   return ctx.scene.leave();
 });

@@ -29,8 +29,8 @@ const walletBalanceHandler = async (ctx) => {
         console.log({ e });
       }
     }
-    await ctx.reply(
-      `Hey ${ctx.session.userInfo?.first_name}. Your wallet is syncing. Please Wait...
+    await ctx.replyWithHTML(
+      `Hey <b><a href="tg://user?id=${ctx.session.userInfo?.id}">${ctx.session.userInfo?.first_name}</a></b>. Your wallet is syncing. Please Wait...
         
 Progress: ${wallet.state.progress.quantity} ${wallet.state.progress.unit}`,
       Markup.inlineKeyboard([
