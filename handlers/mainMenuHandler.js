@@ -13,7 +13,7 @@ const mainMenuHandler = async (ctx) => {
       );
     }
     return ctx.replyWithHTML(
-      `Please choose an option, <a href="tg://user?id=${ctx.session.userInfo?.id}">${ctx.session.userInfo?.first_name}</a>`,
+      `Please choose an option, <b><a href="tg://user?id=${ctx.session.userInfo?.id}">${ctx.session.userInfo?.first_name}</a></b>`,
       Markup.inlineKeyboard([
         [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
         [

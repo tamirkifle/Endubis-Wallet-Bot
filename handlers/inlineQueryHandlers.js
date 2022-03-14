@@ -22,9 +22,7 @@ const qrHandler = async (ctx) => {
     ctx,
     `http://t.me/Testing_TM_Bot?start=${startPayload}`
   );
-  const userLink = ctx.session.userInfo?.username
-    ? `http://t.me/${ctx.session.userInfo?.username}`
-    : `tg://user?id=${ctx.session.userInfo?.id}`;
+
   const results = [
     {
       type: "photo",
@@ -33,7 +31,7 @@ const qrHandler = async (ctx) => {
       title: `Send a payment QR Code`,
       description:
         "Send a message with a QR Code for receiving payments to your address",
-      caption: `Send to <a href="${userLink}"><b>${
+      caption: `Send to <a href="tg://user?id=${ctx.session.userInfo?.id}"><b>${
         ctx.session.userInfo?.username
           ? `@` + ctx.session.userInfo?.username + ` - `
           : ``
@@ -134,7 +132,9 @@ const generalWithAmountHandler = async (ctx) => {
         description:
           "Send a message with a link to the wallet with your contact pre-filled",
         input_message_content: {
-          message_text: `<a href="tg://user?id=${ctx.session.userInfo?.id}">${
+          message_text: `<a href="tg://user?id=${
+            ctx.session.userInfo?.id
+          }"><b>${
             ctx.session.userInfo?.username
               ? `@` + ctx.session.userInfo?.username + ` - `
               : ``
@@ -142,7 +142,7 @@ const generalWithAmountHandler = async (ctx) => {
             ctx.session.userInfo?.last_name
               ? ` ` + ctx.session.userInfo?.last_name
               : ``
-          }</a> has requested <i><b>${amountToSend} ada</b></i>
+          }</b></a> has requested <i><b>${amountToSend} ada</b></i>
 <i>Note: The payment button below expires after one hour</i>`,
           parse_mode: "HTML",
         },

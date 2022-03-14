@@ -51,11 +51,11 @@ const step1 = async (ctx) => {
     const userInfo = await bot.telegram.getChat(toSendId);
     if (ctx.session.amountToSend) {
       await ctx.replyWithHTML(
-        `User <a href="tg://user?id=${toSendId}">${
+        `User <a href="tg://user?id=${toSendId}"><b>${
           userInfo.username ? `@` + userInfo.username + ` - ` : ``
         }${userInfo.first_name}${
           userInfo.last_name ? ` ` + userInfo.last_name : ``
-        }</a> was found in our database.`
+        }</b></a> was found in our database.`
       );
       ctx.scene.state.amount = ctx.session.amountToSend;
       amountHandler()(ctx);
@@ -63,11 +63,11 @@ const step1 = async (ctx) => {
     } else {
       await replyMenuHTML(
         ctx,
-        `User <a href="tg://user?id=${toSendId}">${
+        `User <a href="tg://user?id=${toSendId}"><b>${
           userInfo.username ? `@` + userInfo.username + ` - ` : ``
         }(${userInfo.first_name}${
           userInfo.last_name ? ` ` + userInfo.last_name : ``
-        })</a> was found in our database.\nPlease enter the amount to send (in ada)`
+        })</b></a> was found in our database.\nPlease enter the amount to send (in ada)`
       );
       return ctx.wizard.next();
     }

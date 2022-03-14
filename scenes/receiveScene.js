@@ -41,11 +41,9 @@ step2.action("receiving-qr", async (ctx) => {
     ctx,
     `http://t.me/Testing_TM_Bot?start=${startPayload}`
   );
-  const userLink = ctx.session.userInfo?.username
-    ? `http://t.me/${ctx.session.userInfo?.username}`
-    : `tg://user?id=${ctx.session.userInfo?.id}`;
+
   await replyMenuPhoto(ctx, file_id, {
-    caption: `Send to <a href="${userLink}"><b>${
+    caption: `Send to <a href="tg://user?id=${ctx.session.userInfo?.id}"><b>${
       ctx.session.userInfo?.username
         ? `@` + ctx.session.userInfo?.username + ` - `
         : ``
