@@ -28,8 +28,11 @@ step2.action("receiving-address", async (ctx) => {
     ctx,
     `Any funds sent to this address will appear in your wallet.
 
-<i><b>${address}</b></i>
-`
+<code>${address}</code>
+`,
+    Markup.inlineKeyboard([
+      [Markup.button.switchToChat("Share Address", "add")],
+    ])
   );
   return ctx.scene.leave();
 });
@@ -53,6 +56,7 @@ step2.action("receiving-qr", async (ctx) => {
         : ``
     }</b></a>`,
     parse_mode: "HTML",
+    ...Markup.inlineKeyboard([[Markup.button.switchToChat("Share", "qr")]]),
   });
   return ctx.scene.leave();
 });

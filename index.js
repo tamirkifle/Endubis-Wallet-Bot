@@ -24,6 +24,7 @@ const {
   generalInlineHandler,
   generalWithAmountHandler,
   qrHandler,
+  addrHandler,
 } = require("./handlers/inlineQueryHandlers");
 const { startPayloadHandler } = require("./handlers/startPayloadHandler");
 const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
@@ -67,6 +68,7 @@ bot.on("inline_query", (ctx, next) => {
 });
 bot.inlineQuery("s", sHandler);
 bot.inlineQuery("qr", qrHandler);
+bot.inlineQuery("add", addrHandler);
 bot.inlineQuery(/(\d+.?\d*)/, generalWithAmountHandler);
 
 bot.on("inline_query", generalInlineHandler);

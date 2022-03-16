@@ -8,6 +8,33 @@ const sHandler = (ctx) => {
     switch_pm_parameter: "send",
   });
 };
+const addrHandler = async (ctx) => {
+  const address = await getReceivingAddress(ctx.session.loggedInWalletId);
+  const results = [
+    {
+      type: "article",
+      id: 1,
+      title: "Send your receiving address",
+      input_message_content: {
+        message_text: `You can send to <a href="tg://user?id=${
+          ctx.session.userInfo?.id
+        }"><b>${
+          ctx.session.userInfo?.username
+            ? `@` + ctx.session.userInfo?.username + ` - `
+            : ``
+        }${ctx.session.userInfo?.first_name}${
+          ctx.session.userInfo?.last_name
+            ? ` ` + ctx.session.userInfo?.last_name
+            : ``
+        }</b></a> using this address. 
+
+<code>${address}</code>`,
+        parse_mode: "HTML",
+      },
+    },
+  ];
+  ctx.answerInlineQuery(results);
+};
 const qrHandler = async (ctx) => {
   const startPayload = Buffer.from(
     `sendto=${ctx.session.userInfo?.id}`
@@ -51,8 +78,19 @@ const generalInlineHandler = async (ctx) => {
       id: 1,
       title: "Send your receiving address",
       input_message_content: {
-        message_text: `Send to me using this address. 
-<i><b>${address}</b></i>`,
+        message_text: `Send to <a href="tg://user?id=${
+          ctx.session.userInfo?.id
+        }"><b>${
+          ctx.session.userInfo?.username
+            ? `@` + ctx.session.userInfo?.username + ` - `
+            : ``
+        }${ctx.session.userInfo?.first_name}${
+          ctx.session.userInfo?.last_name
+            ? ` ` + ctx.session.userInfo?.last_name
+            : ``
+        }</b></a> using this address. 
+
+<code>${address}</code>`,
         parse_mode: "HTML",
       },
     },
@@ -150,6 +188,7 @@ const generalWithAmountHandler = async (ctx) => {
 module.exports = {
   sHandler,
   qrHandler,
+  addrHandler,
   generalInlineHandler,
   generalWithAmountHandler,
 };
