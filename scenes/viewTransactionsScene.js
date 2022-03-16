@@ -104,7 +104,7 @@ const txnListHandler = async (ctx, { months: monthsOfTxns, direction }) => {
     await ctx.replyWithHTML(
       `${index === 0 ? "Click More Details to see more." : ""}
   
-Transaction #${txns.length - index}
+<b>#${txns.length - index} of ${txns.length} Transactions</b>
 ${formatTxnData(txn)}`,
       customInlineKeyboard(index, txn.id)
     );

@@ -1,6 +1,6 @@
 const formatTxnData = (transaction) => {
   const feeData = transaction.fee.quantity
-    ? `\n<b>Txn Fee:</b> <i>${transaction.fee.quantity / 1000000} ada</i>`
+    ? `\n<b>Fee:</b> <i>${transaction.fee.quantity / 1000000} ada</i>`
     : ``;
   return `<b>ID:</b> <i>${`${transaction.id.slice(
     0,
