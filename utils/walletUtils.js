@@ -42,8 +42,10 @@ const listWallets = async () => {
   let wallets = await walletServer.wallets();
   console.log(
     wallets.map((w) => ({
+      id: w.id,
       name: w.name,
       balance: w.balance.total.quantity / 1000000,
+      status: w.state.status,
     }))
   );
   return wallets;
@@ -68,7 +70,7 @@ const getReceivingAddress = async (walletId) => {
 
 const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
   const wallet = await getWalletById(walletId);
-  const result = await walletPassphrase(oldPassphrase, newPassphrase);
+  const result = await wallet.updatePassphrase(oldPassphrase, newPassphrase);
   return result;
 };
 
