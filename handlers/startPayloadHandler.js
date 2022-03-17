@@ -21,6 +21,7 @@ const startPayloadHandler = async (ctx, next) => {
       await ctx.reply("You are not logged in.");
       return mainMenuHandler(ctx);
     }
+    let match;
     if (
       (match = decodedPayload.match(/^sendto[=-](.+)&amount=(.+)&expiry=(.+)/))
     ) {

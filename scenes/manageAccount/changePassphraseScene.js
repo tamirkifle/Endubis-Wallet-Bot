@@ -94,12 +94,8 @@ step4.on("text", async (ctx) => {
     return ctx.wizard.selectStep(2);
   }
   try {
-    const result = await changePassphrase(
-      ctx.session.loggedInWalletId,
-      oldPass,
-      newPass
-    );
-    replyMenu(ctx, "Passphrase was successfully changed");
+    await changePassphrase(ctx.session.loggedInWalletId, oldPass, newPass);
+    await replyMenu(ctx, "Passphrase was successfully changed");
   } catch (e) {
     replyMenuHTML(
       ctx,

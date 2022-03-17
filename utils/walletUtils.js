@@ -51,16 +51,16 @@ const listWallets = async () => {
   return wallets;
 };
 
-const getAddresses = async (wallet) => {
-  const addresses = await wallet.getAddresses();
+// const getAddresses = async (wallet) => {
+//   const addresses = await wallet.getAddresses();
 
-  return addresses;
-};
+//   return addresses;
+// };
 
-const getTransactions = async (wallet) => {
-  const transactions = await wallet.getTransactions();
-  return transactions;
-};
+// const getTransactions = async (wallet) => {
+//   const transactions = await wallet.getTransactions();
+//   return transactions;
+// };
 
 const getReceivingAddress = async (walletId) => {
   const wallet = await getWalletById(walletId);
@@ -107,6 +107,13 @@ const idFromSeed = async (seedPhrases) => {
   const { stdout, stderr } = await exec(
     `cd ~/Downloads/cardano-wallet-v2022-01-18-macos64; echo "${seedPhrases}" | ./cardano-address key from-recovery-phrase Shelley | ./cardano-address key public --with-chain-code | ./bech32 | xxd -r -p | b2sum -l 160 | cut -d' ' -f1`
   );
+  if (stderr) {
+    throw {
+      message:
+        "There was an error when executing the cli command for function: idFromSeed",
+      payload: stderr,
+    };
+  }
   return stdout.trim();
 };
 

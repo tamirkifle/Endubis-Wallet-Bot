@@ -26,7 +26,7 @@ const mainMenuHandler = async (ctx) => {
       ])
     );
   } else {
-    const welcomeMsg = await ctx.reply(
+    await ctx.reply(
       "Welcome to the Endubis Wallet 🛅",
       Markup.keyboard([["🏠 Main Menu"]]).resize()
     );

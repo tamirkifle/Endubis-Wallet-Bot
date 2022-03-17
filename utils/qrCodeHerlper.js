@@ -71,36 +71,33 @@ const generateQrFileId = async (ctx, data, image) => {
   return ctx.session.qrCache[data];
 };
 
-const generateQrUrl = async (ctx, data, image) => {
-  const fileId = await generateQrFileId(ctx, data, image);
-  try {
-    let link = await bot.telegram.getFileLink(fileId);
-    console.log(link);
-    return link.href;
-  } catch (e) {
-    ctx.session.qrCache[data] = null;
-    const fileId = await generateQrFileId(ctx, data, image);
-    link = await bot.telegram.getFileLink(fileId);
-    return link.href;
-  }
-};
+// const generateQrUrl = async (ctx, data, image) => {
+//   const fileId = await generateQrFileId(ctx, data, image);
+//   try {
+//     let link = await bot.telegram.getFileLink(fileId);
+//     console.log(link);
+//     return link.href;
+//   } catch (e) {
+//     ctx.session.qrCache[data] = null;
+//     const fileId = await generateQrFileId(ctx, data, image);
+//     const link = await bot.telegram.getFileLink(fileId);
+//     return link.href;
+//   }
+// };
 
-const replyQrFromData = async (ctx, data) => {
-  const qr = await generateQr(data);
-  return ctx.replyWithPhoto({
-    source: qr,
-  });
-};
-const replyMenuQrFromData = async (ctx, data) => {
-  const qr = await generateQr(data);
-  return ctx.replyWithPhoto({
-    source: qr,
-  });
-};
+// const replyQrFromData = async (ctx, data) => {
+//   const qr = await generateQr(data);
+//   return ctx.replyWithPhoto({
+//     source: qr,
+//   });
+// };
+// const replyMenuQrFromData = async (ctx, data) => {
+//   const qr = await generateQr(data);
+//   return ctx.replyWithPhoto({
+//     source: qr,
+//   });
+// };
 
 module.exports = {
-  generateQr,
-  replyQrFromData,
   generateQrFileId,
-  generateQrUrl,
 };
