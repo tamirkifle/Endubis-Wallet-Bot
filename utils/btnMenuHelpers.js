@@ -13,6 +13,8 @@ const replyMenuMDV2 = (ctx, mdMessage, otherOptions = {}) => {
       ...otherOptions.reply_markup.inline_keyboard,
       [mainMenuButton()],
     ];
+  } else {
+    otherOptions.reply_markup.inline_keyboard = [[mainMenuButton()]];
   }
   return ctx.replyWithMarkdownV2(mdMessage, otherOptions);
 };
@@ -25,6 +27,8 @@ const replyMenu = (ctx, mdMessage, otherOptions = {}) => {
       ...otherOptions.reply_markup.inline_keyboard,
       [mainMenuButton()],
     ];
+  } else {
+    otherOptions.reply_markup.inline_keyboard = [[mainMenuButton()]];
   }
   return ctx.reply(mdMessage, otherOptions);
 };
@@ -38,6 +42,8 @@ const replyMenuHTML = (ctx, mdMessage, otherOptions = {}) => {
       ...otherOptions.reply_markup.inline_keyboard,
       [mainMenuButton()],
     ];
+  } else {
+    otherOptions.reply_markup.inline_keyboard = [[mainMenuButton()]];
   }
   return ctx.replyWithHTML(mdMessage, otherOptions);
 };
@@ -50,6 +56,8 @@ const replyMenuPhoto = (ctx, photo, otherOptions = {}) => {
       ...otherOptions.reply_markup.inline_keyboard,
       [mainMenuButton()],
     ];
+  } else {
+    otherOptions.reply_markup.inline_keyboard = [[mainMenuButton()]];
   }
   return ctx.replyWithPhoto(photo, otherOptions);
 };
