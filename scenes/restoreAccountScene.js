@@ -90,7 +90,7 @@ step3.on("text", async (ctx) => {
     const userInfo = await bot.telegram.getChat(wallet.name);
     ctx.session.userInfo = userInfo;
 
-    await ctx.reply(`Weclcome to your account\n`);
+    await ctx.reply(`Welcome to your account\n`);
     mainMenuHandler(ctx);
   } catch (e) {
     if (e.response?.data?.message) {
