@@ -20,6 +20,7 @@ const mainMenuHandler = async (ctx) => {
           Markup.button.callback("📩 Receive", "receive"),
           Markup.button.callback("💸 Send", "send"),
         ],
+        [Markup.button.callback("💳 Buy", "deposit")],
         [Markup.button.callback("📒 Transaction History", "view-transactions")],
         [Markup.button.callback(" ⚙️ Manage Account", "manage-account")],
         [Markup.button.callback("🚪 Logout", "log-out")],

@@ -6,6 +6,7 @@ const { telegrafThrottler } = require("telegraf-throttler");
 const { createAccountScene } = require("./scenes/createAccountScene");
 const { restoreAccountScene } = require("./scenes/restoreAccountScene");
 const { receiveScene } = require("./scenes/receiveScene");
+const { depositScene } = require("./scenes/depositScene");
 const { manageAccountScene } = require("./scenes/manageAccountScene");
 const {
   changePassphraseScene,
@@ -37,6 +38,7 @@ const stage = new Scenes.Stage([
   createAccountScene,
   restoreAccountScene,
   receiveScene,
+  depositScene,
   sendScene,
   viewTransactionsScene,
   manageAccountScene,
@@ -81,6 +83,7 @@ bot.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 bot.action(["wallet-balance", "refresh-balance"], walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
 bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
+bot.action("deposit", Scenes.Stage.enter("depositScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", (ctx) => {
