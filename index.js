@@ -86,11 +86,11 @@ bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
 bot.action("deposit", Scenes.Stage.enter("depositScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
-bot.action("log-out", (ctx) => {
+bot.action("log-out", async (ctx) => {
   ctx.session.loggedInWalletId = null;
   ctx.session.userInfo = null;
   try {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
   } catch (error) {
     console.log(error);
   }
@@ -102,9 +102,9 @@ bot.action("back-to-menu", mainMenuHandler);
 
 //THis will only activate if called outside the scene: createAccountScene, eg. if a user clicks an older message with the delete button
 //So Just delete and don't try to restore the wallet
-bot.action("delete-then-restore", (ctx) => {
+bot.action("delete-then-restore", async (ctx) => {
   try {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
   } catch (error) {
     console.log(error);
   }

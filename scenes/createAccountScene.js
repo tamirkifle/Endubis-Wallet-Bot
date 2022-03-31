@@ -35,8 +35,12 @@ step2.action("generate-seed", generateSeedHandler);
 
 step2.action("restore-wallet", Scenes.Stage.enter("restoreAccountScene"));
 
-step2.action("delete-then-restore", (ctx) => {
-  ctx.deleteMessage();
+step2.action("delete-then-restore", async (ctx) => {
+  try {
+    await ctx.deleteMessage();
+  } catch (error) {
+    console.log(error);
+  }
   Scenes.Stage.enter("restoreAccountScene")(ctx);
 });
 
