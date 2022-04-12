@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "serve": "nodemon -x 'node index.js || touch index.js'  2>&1 | tee -a app2.log",
-    "start": "nodemon --inspect index.js  2>&1 | tee -a app2.log"
+    "start": "concurrently \"nodemon --inspect index.js  2>&1 | tee -a app2.log\" \"nodemon --inspect server.js\""
   },
   "keywords": [
     "wallet",
@@ -20,8 +20,10 @@
   "dependencies": {
     "canvas": "^2.9.0",
     "cardano-wallet-js": "^1.3.3",
+    "concurrently": "^7.0.0",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.0",
+    "express": "^4.17.3",
     "qr-code-styling-node": "^1.5.0",
     "telegraf": "^4.7.0",
     "telegraf-session-local": "^2.1.0",
