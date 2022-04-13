@@ -1,6 +1,9 @@
 node_modules/
 .env
 wallet_bot_db*
+firestore-cred/
+firestore*/
 *.log 
+
 
 .DS_Store

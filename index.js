@@ -1,6 +1,8 @@
 const { Scenes } = require("telegraf");
 const LocalSession = require("telegraf-session-local");
 // const CryptoJS = require("crypto-js");
+
+const { firestoreMiddleware } = require("./firestoreInit");
 const { telegrafThrottler } = require("telegraf-throttler");
 
 const { createAccountScene } = require("./scenes/createAccountScene");
@@ -48,14 +50,17 @@ const stage = new Scenes.Stage([
   sendToTelegramScene,
   sendToUserIdScene,
 ]);
-const localSession = new LocalSession({
-  database: "wallet_bot_db",
-  format: {
-    serialize: (obj) => JSON.stringify(obj, null, 2), // null & 2 for pretty-formatted JSON
-    deserialize: (str) => JSON.parse(str),
-  },
-});
-bot.use(localSession.middleware());
+// const localSession = new LocalSession({
+//   database: "wallet_bot_db",
+//   format: {
+//     serialize: (obj) => JSON.stringify(obj, null, 2), // null & 2 for pretty-formatted JSON
+//     deserialize: (str) => JSON.parse(str),
+//   },
+// });
+// bot.use(localSession.middleware());
+
+bot.use(firestoreMiddleware("sessions"));
+
 bot.use(stage.middleware());
 
 bot.on("inline_query", (ctx, next) => {
