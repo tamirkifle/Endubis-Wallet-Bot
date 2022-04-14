@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const port = 4004;
 const bot = require("./botSession");
+const deriveOtherKeys = require("./utils/newWalletUtils/deriveOtherKeys");
 
 // const Cors = require("cors")
 
@@ -22,7 +23,7 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
   res.send("Server is up and running! :D");
 });
-app.post("/connect", (req, res) => {
+app.post("/connect", async (req, res) => {
   /*TODO:
     - Validate req.body check bech32 account key
     - derive account -> external pub key to derive unused addresses
@@ -32,12 +33,17 @@ app.post("/connect", (req, res) => {
     - write new getBalance fn
     - send user message that he has successfully logged in
   */
+
   const { userId, bech32xPub } = req.body;
   if (userId && bech32xPub) {
-    bot.telegram.sendMessage(
-      req.body.userId || 345931304,
-      `✅ You have been successfully logged in.`
-    );
+    const keys = await deriveOtherKeys(bech32xPub);
+    console.log(keys);
+    // await saveAccountDataToSession(keys);
+    userId &&
+      bot.telegram.sendMessage(
+        userId,
+        `🎉 You have been successfully logged in.`
+      );
   }
   res.end();
 });
