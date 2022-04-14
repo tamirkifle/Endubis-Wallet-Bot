@@ -1,3 +1,3 @@
-const frontendBaseUrl = "http://127.0.0.1:3000";
+const clientBaseUrl = "http://192.168.0.170:3000";
 
-module.exports = { frontendBaseUrl };
+module.exports = { clientBaseUrl };

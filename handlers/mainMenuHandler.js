@@ -1,6 +1,10 @@
 const { Markup } = require("telegraf");
+const { clientBaseUrl } = require("../utils/urls");
 
 const mainMenuHandler = async (ctx) => {
+  const createLink = `${clientBaseUrl}/create?userId=${ctx.from.id}`;
+  const restoreLink = `${clientBaseUrl}/restore?userId=${ctx.from.id}`;
+
   //If in a scene, leave it.
   ctx.scene?.leave();
 
@@ -36,6 +40,8 @@ const mainMenuHandler = async (ctx) => {
       Markup.inlineKeyboard([
         [Markup.button.callback("🆕 Create a New Wallet", "create-wallet")],
         [Markup.button.callback("🗝 Restore a Wallet", "restore-wallet")],
+        [Markup.button.url("🗝 Secure Create (Testing)", createLink)],
+        [Markup.button.url("🗝 Secure Restore (Testing)", restoreLink)],
       ])
     );
   }
