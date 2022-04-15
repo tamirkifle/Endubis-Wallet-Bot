@@ -1,8 +1,8 @@
 const { Scenes } = require("telegraf");
-const LocalSession = require("telegraf-session-local");
+// const LocalSession = require("telegraf-session-local");
 // const CryptoJS = require("crypto-js");
 
-const { firestoreMiddleware } = require("./firestoreInit");
+const { firestoreMiddlewareFn } = require("./firestoreInit");
 const { telegrafThrottler } = require("telegraf-throttler");
 
 const { createAccountScene } = require("./scenes/createAccountScene");
@@ -59,7 +59,7 @@ const stage = new Scenes.Stage([
 // });
 // bot.use(localSession.middleware());
 
-bot.use(firestoreMiddleware("sessions"));
+bot.use(firestoreMiddlewareFn);
 
 bot.use(stage.middleware());
 

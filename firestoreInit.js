@@ -8,10 +8,25 @@ const { getFirestore } = require("firebase-admin/firestore");
 initializeApp();
 
 const db = getFirestore();
-
+const sessionDocName = "sessions";
+const getSessionKey = (ctx) =>
+  ctx.from && ctx.chat && `${ctx.from.id}-${ctx.chat.id}`;
+const userIdFromSessionKey = (sessionKey) => sessionKey.split("-")[0];
 const firestoreMiddleware = (collectionName) =>
   firestoreSession(db.collection(collectionName));
 const firestoreLazyMiddleware = (collectionName) =>
-  firestoreSession(db.collection(collectionName), { lazy: true });
+  firestoreSession(db.collection(collectionName), {
+    lazy: true,
+    getSessionKey,
+  });
+const firestoreMiddlewareFn = firestoreMiddleware(sessionDocName);
+const firestoreLazyMiddlewareFn = firestoreLazyMiddleware(sessionDocName);
 
-module.exports = { firestoreMiddleware, firestoreLazyMiddleware };
+module.exports = {
+  db,
+  firestoreMiddlewareFn,
+  firestoreLazyMiddlewareFn,
+  getSessionKey,
+  userIdFromSessionKey,
+  sessionDocName,
+};
