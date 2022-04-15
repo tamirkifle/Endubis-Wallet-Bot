@@ -1,3 +1,4 @@
-const clientBaseUrl = "http://192.168.0.170:3000";
+require("dotenv").config();
+const clientBaseUrl = process.env.CLIENTBASEURL;
 
 module.exports = { clientBaseUrl };
