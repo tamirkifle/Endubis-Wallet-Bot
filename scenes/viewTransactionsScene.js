@@ -1,7 +1,8 @@
 const { Scenes, Composer, Markup } = require("telegraf");
-const { getWalletById } = require("../utils/walletUtils");
+// const { getWalletById } = require("../utils/walletUtils");
 const { mainMenuButton } = require("../utils/btnMenuHelpers");
 const { formatTxnData } = require("../utils/formatTxnData");
+const { getTransactions } = require("../utils/newWalletUtils/newWalletUtils");
 
 const step1 = (ctx) => {
   ctx.reply(
@@ -63,20 +64,21 @@ Step 2
 */
 
 const txnListHandler = async (ctx, { months: monthsOfTxns, direction }) => {
-  const wallet = await getWalletById(ctx.session.loggedInWalletId);
+  // const wallet = await getWalletById(ctx.session.loggedInWalletId);
+  const { session } = ctx;
   let txns;
   if (monthsOfTxns) {
     const oneMonthInMS = 2629800000;
     const endDate = new Date(Date.now());
     const startDate = new Date(Date.now() - oneMonthInMS * monthsOfTxns);
-    txns = await wallet.getTransactions(startDate, endDate);
+    txns = await getTransactions(session);
   } else if (direction) {
-    txns = await wallet.getTransactions();
+    txns = await getTransactions(session);
     txns = txns.filter(
       (txn) => txn.direction === String(direction).toLowerCase()
     );
   } else {
-    txns = await wallet.getTransactions();
+    txns = await getTransactions(session);
   }
   const customInlineKeyboard = (index, txnId) => {
     if (index === txns.length - 1) {

@@ -4,7 +4,11 @@ const {
   replyMenuHTML,
   replyMenuPhoto,
 } = require("../utils/btnMenuHelpers");
-const { getReceivingAddress } = require("../utils/walletUtils");
+const {
+  getReceivingAddress,
+} = require("../utils/newWalletUtils/newWalletUtils");
+// const { getReceivingAddress } = require("../utils/walletUtils");
+
 const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 // TODO: Generate QR Code
@@ -23,7 +27,7 @@ const step1 = (ctx) => {
 
 const step2 = new Composer();
 step2.action("receiving-address", async (ctx) => {
-  const address = await getReceivingAddress(ctx.session.loggedInWalletId);
+  const address = await getReceivingAddress(ctx.session);
   replyMenuHTML(
     ctx,
     `Any funds sent to this address will appear in your wallet.
