@@ -7,9 +7,7 @@ const {
   WalletsApi,
 } = require("cardano-wallet-js/dist/api");
 
-let walletServer = WalletServer.init(
-  process.env.WALLET_SERVER_URL || "http://localhost:8090/v2"
-);
+let walletServer = WalletServer.init("http://35.178.231.103:8090/v2");
 
 const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
   const seedArray = Seed.toMnemonicList(seedPhrases);

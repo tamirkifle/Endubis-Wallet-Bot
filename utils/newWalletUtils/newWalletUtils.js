@@ -19,6 +19,8 @@ const getReceivingAddress = async (session) => {
   }
 };
 
+const deleteWallet = async (walletId) => {};
+
 // const txnformat = {
 //   id: "id",
 //   direction: "incoming" | "outgoing",
@@ -143,6 +145,7 @@ const getBalanceFromSession = async (session) => {
 };
 
 module.exports = {
+  deleteWallet,
   getReceivingAddress,
   getBalanceFromSession,
   getTransactions,

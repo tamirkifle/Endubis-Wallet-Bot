@@ -28,7 +28,9 @@ step2.on("text", async (ctx) => {
   //TODO: Validate address
   console.log("here");
   const addrToSendTo = ctx.message?.text;
-  ctx.scene.state.receiverAddress = new AddressWallet(addrToSendTo);
+  ctx.scene.state.receiverAddress = JSON.parse(
+    JSON.stringify(new AddressWallet(addrToSendTo))
+  );
   replyMenu(ctx, "Please enter the amount to send (in ada)");
   return ctx.wizard.next();
 });

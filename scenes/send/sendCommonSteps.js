@@ -3,7 +3,7 @@ const { getWalletById, makeShelleyWallet } = require("../../utils/walletUtils");
 const { replyMenu, mainMenuButton } = require("../../utils/btnMenuHelpers");
 const { formatTxnData } = require("../../utils/formatTxnData");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
-const { ShelleyWallet } = require("cardano-wallet-js");
+const { AddressWallet } = require("cardano-wallet-js");
 
 const sendCommonSteps = (errorMsg) => {
   /* 
@@ -19,7 +19,9 @@ Step 3
 
   step3.on("text", async (ctx) => {
     ctx.scene.state.amount = Number(ctx.message?.text) * 1000000; //to lovelace
-    const { amount, receiverAddress } = ctx.scene.state;
+    let { amount, receiverAddress } = ctx.scene.state;
+    receiverAddress = new AddressWallet(receiverAddress.id);
+
     if (!amount) {
       replyMenu(
         ctx,
@@ -27,8 +29,8 @@ Step 3
       );
       return;
     }
-    ctx.scene.state.wallet = await getWalletById(ctx.session.loggedInWalletId);
-    const { wallet } = ctx.scene.state;
+    let wallet = await getWalletById(ctx.session.loggedInWalletId);
+    ctx.scene.state.wallet = JSON.parse(JSON.stringify(wallet));
     try {
       const estimatedFees = await wallet.estimateFee(
         [receiverAddress],
@@ -84,15 +86,16 @@ Step 5
 
   step5.on("text", async (ctx) => {
     const passphrase = ctx.message?.text;
-    if (!(ctx.scene.state.wallet instanceof ShelleyWallet)) {
-      ctx.scene.state.wallet = makeShelleyWallet(ctx.scene.state.wallet);
-    }
-    const { amount, receiverAddress, wallet } = ctx.scene.state;
+    let wallet = makeShelleyWallet(ctx.scene.state.wallet);
+
+    let { amount, receiverAddress } = ctx.scene.state;
+    receiverAddress = new AddressWallet(receiverAddress.id);
+
     try {
-      ctx.scene.state.transaction = await wallet.sendPayment(
-        passphrase,
-        [receiverAddress],
-        [amount]
+      ctx.scene.state.transaction = JSON.parse(
+        JSON.stringify(
+          await wallet.sendPayment(passphrase, [receiverAddress], [amount])
+        )
       );
       const { transaction } = ctx.scene.state;
       ctx.replyWithHTML(
@@ -122,12 +125,11 @@ ${formatTxnData(transaction)}`,
 
   const step6 = new Composer();
   step6.action("refresh-txn", async (ctx) => {
-    if (!(ctx.scene.state.wallet instanceof ShelleyWallet)) {
-      ctx.scene.state.wallet = makeShelleyWallet(ctx.scene.state.wallet);
-    }
-    const { wallet } = ctx.scene.state;
-    ctx.scene.state.transaction = await wallet.getTransaction(
-      ctx.scene.state.transaction.id
+    let wallet = makeShelleyWallet(ctx.scene.state.wallet);
+    ctx.scene.state.transaction = JSON.parse(
+      JSON.stringify(
+        await wallet.getTransaction(ctx.scene.state.transaction.id)
+      )
     ); //refresh txn
     const { transaction } = ctx.scene.state;
     try {
