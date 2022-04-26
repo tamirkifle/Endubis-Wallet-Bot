@@ -1,4 +1,12 @@
 const { getAddressSummary } = require("./helpers/getAddressesInfo");
+const { bech32 } = require("cardano-crypto.js");
+const { WalletServer, ShelleyWallet } = require("cardano-wallet-js");
+const blake2 = require("blake2");
+
+require("dotenv").config();
+const walletServer = WalletServer.init(
+  process.env.WALLET_SERVER_URL || "http://localhost:8090/v2"
+);
 
 const getReceivingAddress = async (session) => {
   const { loggedInXpub, XpubsInfo } = session;
@@ -144,9 +152,63 @@ const getBalanceFromSession = async (session) => {
   return balance;
 };
 
+const createCardanoWallet = async (bech32EncodedAccountXpub, walletName) => {
+  const payload = {
+    name: walletName,
+    account_public_key: bech32
+      .decode(bech32EncodedAccountXpub)
+      .data.toString("hex"),
+  };
+  try {
+    const res = await walletServer.walletsApi.postWallet(payload);
+    const apiWallet = res.data;
+    return ShelleyWallet.from(apiWallet, this.config);
+  } catch (e) {
+    if (e?.response?.data?.code === "wallet_already_exists") {
+      return walletServer.getShelleyWallet(
+        getWalletId(bech32EncodedAccountXpub)
+      );
+    } else {
+      throw e;
+    }
+  }
+};
+
+const getWalletById = async (walletId) => {
+  try {
+    const wallet = await walletServer.getShelleyWallet(walletId);
+    return wallet;
+  } catch (e) {
+    if (e.response.data.code === "no_such_wallet") {
+      return null;
+    } else {
+      throw e;
+    }
+  }
+};
+
+const getWalletId = (bech32EncodedAccountXpub) => {
+  const h = blake2.createHash("blake2b", { digestLength: 20 });
+  h.update(bech32.decode(bech32EncodedAccountXpub).data);
+  return h.digest("hex");
+};
+
+// console.log(
+//   blake2b(
+//     bech32.decode(
+//       "endbs13qvpmh86s57alus497hjlxamamqtlylq7xq8kkxdvnvvgnd6hmdz6hp482mrkk65jdxjnuelu5ushq9vnrpv085vqzegth7uc5zujwcsggfnk"
+//     ).data,
+//     160
+//   )
+// );
+
+console.log();
+
 module.exports = {
   deleteWallet,
   getReceivingAddress,
   getBalanceFromSession,
   getTransactions,
+  createCardanoWallet,
+  getWalletById,
 };

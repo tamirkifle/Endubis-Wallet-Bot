@@ -1,7 +1,7 @@
 const { Scenes } = require("telegraf");
 // const CryptoJS = require("crypto-js");
 
-const { firestoreMiddlewareFn } = require("./firestoreInit");
+const { firestoreMiddlewareFn, getSessionKey } = require("./firestoreInit");
 const { telegrafThrottler } = require("telegraf-throttler");
 
 const { receiveScene } = require("./scenes/receiveScene");
@@ -14,8 +14,8 @@ const {
 const { mainMenuHandler } = require("./handlers/mainMenuHandler");
 const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
-// const { sendScene } = require("./scenes/sendScene");
-// const { sendToAddressScene } = require("./scenes/send/sendToAddressScene");
+const { sendScene } = require("./scenes/sendScene");
+const { sendToAddressScene } = require("./scenes/send/sendToAddressScene");
 // const { sendToTelegramScene } = require("./scenes/send/sendToTelegramScene");
 const {
   sHandler,
@@ -29,17 +29,20 @@ const { startPayloadHandler } = require("./handlers/startPayloadHandler");
 
 const bot = require("./botSession");
 const { replyMenu } = require("./utils/btnMenuHelpers");
+const {
+  createCardanoWallet,
+} = require("./utils/newWalletUtils/newWalletUtils");
 
 const throttler = telegrafThrottler();
 bot.use(throttler);
 const stage = new Scenes.Stage([
   receiveScene,
   depositScene,
-  // sendScene,
+  sendScene,
   viewTransactionsScene,
   manageAccountScene,
   deleteWalletScene,
-  // sendToAddressScene,
+  sendToAddressScene,
   // sendToTelegramScene,
   // sendToUserIdScene,
 ]);
@@ -47,6 +50,21 @@ const stage = new Scenes.Stage([
 bot.use(firestoreMiddlewareFn);
 
 bot.use(stage.middleware());
+bot.use(async (ctx, next) => {
+  const sessionData = ctx.session;
+  if (sessionData.loggedInXpub) {
+    try {
+      const wallet = await createCardanoWallet(
+        sessionData.loggedInXpub,
+        getSessionKey(ctx)
+      );
+      ctx.session.loggedInWalletId = wallet.id;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  return next();
+});
 
 bot.on("callback_query", async (ctx, next) => {
   if (!ctx.session.loggedInXpub) {
@@ -56,6 +74,7 @@ bot.on("callback_query", async (ctx, next) => {
     );
     return ctx.answerCbQuery();
   }
+  ctx.answerCbQuery();
   return next();
 });
 
@@ -81,7 +100,7 @@ bot.hears("🏠 Main Menu", mainMenuHandler);
 
 bot.action(["wallet-balance", "refresh-balance"], walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
-// bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
+bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
 bot.action("deposit", Scenes.Stage.enter("depositScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
