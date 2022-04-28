@@ -4,6 +4,9 @@ const { replyMenu, mainMenuButton } = require("../../utils/btnMenuHelpers");
 const { formatTxnData } = require("../../utils/formatTxnData");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { AddressWallet } = require("cardano-wallet-js");
+const {
+  buildTransaction,
+} = require("../../utils/newWalletUtils/newWalletUtils");
 
 const sendCommonSteps = (errorMsg) => {
   /* 
@@ -36,6 +39,8 @@ Step 3
         [receiverAddress],
         [amount]
       );
+      // let coins = await wallet.getCoinSelection([receiverAddress], [amount]);
+      // console.log(coins.inputs, coins.outputs, coins.change);
       if (estimatedFees) {
         ctx.reply(
           `Your Available balance: ${
@@ -63,11 +68,16 @@ Est. Fees: ${estimatedFees.estimated_min.quantity / 1000000} ada - ${
 
   /* 
 Step 4
-- Ask for passphrase
+- Build Transaction and send to URL
 */
 
   const step4 = new Composer();
   step4.action("proceed-txn", async (ctx) => {
+    let { amount, receiverAddress, wallet } = ctx.scene.state;
+    receiverAddress = new AddressWallet(receiverAddress.id);
+    wallet = makeShelleyWallet(ctx.scene.state.wallet);
+    const txBuild = await buildTransaction(wallet, amount, receiverAddress);
+    console.log(txBuild);
     replyMenu(
       ctx,
       `Please enter your passphrase to sign and submit this transaction.`
