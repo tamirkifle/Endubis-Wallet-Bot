@@ -7,6 +7,7 @@ const {
   WalletsApi,
 } = require("cardano-wallet-js/dist/api");
 
+require("dotenv").config();
 let walletServer = WalletServer.init(
   process.env.WALLET_SERVER_URL || "http://localhost:8090/v2"
 );
@@ -141,7 +142,9 @@ const makeShelleyWallet = (wallet) => {
   return shelley;
 };
 (async function () {
-  listWallets();
+  // listWallets();
+  // deleteWallet("6b619ed2da709dd8fbbbf0f1cdf8e0175f1282fe");
+  // deleteWallet("a6e8fd1f12afefb8fbf4d0caaa9836c9f22801be");
 })();
 
 module.exports = {
