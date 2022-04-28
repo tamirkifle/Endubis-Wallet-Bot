@@ -1,43 +1,43 @@
-const {
-  QRCodeStyling,
-} = require("qr-code-styling-node/lib/qr-code-styling.common.js");
-// const QRCode = require("qrcode");
-const nodeCanvas = require("canvas");
+// const {
+//   QRCodeStyling,
+// } = require("qr-code-styling-node/lib/qr-code-styling.common.js");
+const QRCode = require("qrcode");
+// const nodeCanvas = require("canvas");
 
 const bot = require("../botSession");
 
-const generateQr = (data, image = "https://svgshare.com/i/f84.svg") => {
-  const obj = {
-    nodeCanvas,
-    width: 300,
-    height: 300,
-    data,
-    dotsOptions: {
-      color: "#033859",
-      // color: "#4f4f07",
-      type: "square",
-    },
-    cornersSquareOptions: { type: "square" },
-    backgroundOptions: {
-      color: "#ffedd1",
-      // color: "#e9ebee",
-    },
-    imageOptions: {
-      crossOrigin: "anonymous",
-      margin: 0,
-    },
-  };
-  if (image) {
-    obj.image = image;
-  }
-  const qrCode = new QRCodeStyling(obj);
-  return qrCode.getRawData();
-};
-
-// const generateQR = async (text) => {
-//   const dataURI = await QRCode.toDataURL(text);
-//   return Buffer.from(dataURI.replace("data:image/png;base64,", ""), "base64");
+// const generateQr = (data, image = "https://svgshare.com/i/f84.svg") => {
+//   const obj = {
+//     nodeCanvas,
+//     width: 300,
+//     height: 300,
+//     data,
+//     dotsOptions: {
+//       color: "#033859",
+//       // color: "#4f4f07",
+//       type: "square",
+//     },
+//     cornersSquareOptions: { type: "square" },
+//     backgroundOptions: {
+//       color: "#ffedd1",
+//       // color: "#e9ebee",
+//     },
+//     imageOptions: {
+//       crossOrigin: "anonymous",
+//       margin: 0,
+//     },
+//   };
+//   if (image) {
+//     obj.image = image;
+//   }
+//   const qrCode = new QRCodeStyling(obj);
+//   return qrCode.getRawData();
 // };
+
+const generateQr = async (text) => {
+  const dataURI = await QRCode.toDataURL(text);
+  return Buffer.from(dataURI.replace("data:image/png;base64,", ""), "base64");
+};
 
 // const getCodeFromQrCodeImageUrl = (url) => {
 //   try {

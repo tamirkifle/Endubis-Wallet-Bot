@@ -16,7 +16,7 @@ const { walletBalanceHandler } = require("./handlers/walletBalanceHandler");
 const { viewTransactionsScene } = require("./scenes/viewTransactionsScene");
 const { sendScene } = require("./scenes/sendScene");
 const { sendToAddressScene } = require("./scenes/send/sendToAddressScene");
-// const { sendToTelegramScene } = require("./scenes/send/sendToTelegramScene");
+const { sendToTelegramScene } = require("./scenes/send/sendToTelegramScene");
 const {
   sHandler,
   generalInlineHandler,
@@ -25,7 +25,7 @@ const {
   addrHandler,
 } = require("./handlers/inlineQueryHandlers");
 const { startPayloadHandler } = require("./handlers/startPayloadHandler");
-// const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
+const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
 
 const bot = require("./botSession");
 const { replyMenu } = require("./utils/btnMenuHelpers");
@@ -43,8 +43,8 @@ const stage = new Scenes.Stage([
   manageAccountScene,
   deleteWalletScene,
   sendToAddressScene,
-  // sendToTelegramScene,
-  // sendToUserIdScene,
+  sendToTelegramScene,
+  sendToUserIdScene,
 ]);
 
 bot.use(firestoreMiddlewareFn);
@@ -67,14 +67,18 @@ bot.use(async (ctx, next) => {
 });
 
 bot.on("callback_query", async (ctx, next) => {
-  if (!ctx.session.loggedInXpub) {
-    await replyMenu(
-      ctx,
-      "You are not logged in. Go to the Main Menu to Log In"
-    );
-    return ctx.answerCbQuery();
+  try {
+    if (!ctx.session.loggedInXpub) {
+      await replyMenu(
+        ctx,
+        "You are not logged in. Go to the Main Menu to Log In"
+      );
+      return ctx.answerCbQuery();
+    }
+    ctx.answerCbQuery(undefined, { cache_time: 5 });
+  } catch (e) {
+    console.log(e);
   }
-  ctx.answerCbQuery();
   return next();
 });
 

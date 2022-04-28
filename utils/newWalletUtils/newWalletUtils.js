@@ -1,7 +1,7 @@
 const { getAddressSummary } = require("./helpers/getAddressesInfo");
 const { bech32 } = require("cardano-crypto.js");
-const { WalletServer, ShelleyWallet } = require("cardano-wallet-js");
-const blake2 = require("blake2");
+const { WalletServer, ShelleyWallet, Seed } = require("cardano-wallet-js");
+const blake = require("blakejs");
 
 require("dotenv").config();
 const walletServer = WalletServer.init(
@@ -188,10 +188,59 @@ const getWalletById = async (walletId) => {
 };
 
 const getWalletId = (bech32EncodedAccountXpub) => {
-  const h = blake2.createHash("blake2b", { digestLength: 20 });
-  h.update(bech32.decode(bech32EncodedAccountXpub).data);
-  return h.digest("hex");
+  return blake.blake2bHex(
+    bech32.decode(bech32EncodedAccountXpub).data,
+    null,
+    20
+  );
 };
+
+const getTtl = async () => {
+  let info = await walletServer.getNetworkInformation();
+  return info.node_tip.absolute_slot_number * 12000;
+};
+
+const buildTransaction = async (wallet, amount, receiverAddress) => {
+  const ttl = getTtl();
+  const coinSelection = await wallet.getCoinSelection(
+    [receiverAddress],
+    [amount]
+  );
+  return Seed.buildTransaction(coinSelection, ttl);
+};
+
+// const h = blake2.createHash("blake2b", { digestLength: 20 });
+const blake2bHex = blake.blake2bHex(
+  Buffer.from(
+    "15b6386718dc443e08b0b2c7f79b153e2facc4fc3538bb1121fa955513e0eb0269fdebf6dff53ad78354da5e33cd891877213fa81cec6df0b1e7ae6a312e5344",
+    "hex"
+  ),
+  null,
+  20
+);
+console.log(blake2bHex);
+
+console.log(
+  getWalletId(
+    "endbs13qvpmh86s57alus497hjlxamamqtlylq7xq8kkxdvnvvgnd6hmdz6hp482mrkk65jdxjnuelu5ushq9vnrpv085vqzegth7uc5zujwcsggfnk"
+  )
+);
+// h.update(
+//   Buffer.from(
+//     "15b6386718dc443e08b0b2c7f79b153e2facc4fc3538bb1121fa955513e0eb0269fdebf6dff53ad78354da5e33cd891877213fa81cec6df0b1e7ae6a312e5344",
+//     "hex"
+//   )
+// );
+// console.log(h.digest("hex"));
+// console.log(
+//   Buffer.from(
+//     bech32
+//       .decode(
+//         "endbs13qvpmh86s57alus497hjlxamamqtlylq7xq8kkxdvnvvgnd6hmdz6hp482mrkk65jdxjnuelu5ushq9vnrpv085vqzegth7uc5zujwcsggfnk"
+//       )
+//       .data.toString("hex")
+//   )
+// );
 
 // console.log(
 //   blake2b(
@@ -202,7 +251,11 @@ const getWalletId = (bech32EncodedAccountXpub) => {
 //   )
 // );
 
-console.log();
+// console.log(
+//   getWalletId(
+//     "endbs1zkmrseccm3zruz9sktrl0xc48ch6e38ux5utkyfpl2242ylqavpxnl0t7m0l2wkhsd2d5h3neky3saep875pemrd7zc70tn2xyh9x3quzyex6"
+//   )
+// );
 
 module.exports = {
   deleteWallet,
@@ -211,4 +264,5 @@ module.exports = {
   getTransactions,
   createCardanoWallet,
   getWalletById,
+  buildTransaction,
 };
