@@ -27,7 +27,8 @@ const getWalletById = async (walletId) => {
     const wallet = await walletServer.getShelleyWallet(walletId);
     return wallet;
   } catch (e) {
-    if (e.response.data.code === "no_such_wallet") {
+    console.log(e.message);
+    if (e.response?.data?.code === "no_such_wallet") {
       return null;
     } else {
       throw e;
@@ -141,6 +142,11 @@ const makeShelleyWallet = (wallet) => {
   shelley.walletsApi = Object.assign(new WalletsApi(), shelley.walletsApi);
   return shelley;
 };
+
+const getTransaction = (wallet, txId) => {
+  return wallet.getTransaction(txId);
+};
+
 (async function () {
   // listWallets();
   // deleteWallet("6b619ed2da709dd8fbbbf0f1cdf8e0175f1282fe");
@@ -159,4 +165,5 @@ module.exports = {
   getReceivingAddress,
   makeShelleyWallet,
   generateSeed,
+  getTransaction,
 };

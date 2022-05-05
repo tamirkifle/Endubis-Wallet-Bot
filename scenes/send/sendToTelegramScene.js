@@ -63,7 +63,9 @@ step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
     );
     return ctx.wizard.next();
   } catch (e) {
-    await ctx.replyWithHTML(`🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
+    await ctx.replyWithHTML(
+      `🔴 <b>ERROR</b> \n\n${e.response?.data?.message || e.message}`
+    );
     await replyMenu(
       ctx,
       `Let's try again. Please enter the telegram username or phone number of the user you want to send to`
