@@ -1,6 +1,6 @@
 const { replyMenuHTML } = require("../utils/btnMenuHelpers");
 // const { getWalletById } = require("../utils/walletUtils");
-const { getBalance } = require("../utils/newWalletUtils/newWalletUtils");
+const { getBalance } = require("../utils/newWalletUtils");
 const { getWalletById } = require("../utils/walletUtils");
 const { mainMenuHandler } = require("./mainMenuHandler");
 

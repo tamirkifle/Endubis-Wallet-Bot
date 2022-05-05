@@ -4,9 +4,7 @@ const {
   replyMenuHTML,
   replyMenuPhoto,
 } = require("../utils/btnMenuHelpers");
-const {
-  getReceivingAddress,
-} = require("../utils/newWalletUtils/newWalletUtils");
+const { getReceivingAddress } = require("../utils/newWalletUtils");
 // const { getReceivingAddress } = require("../utils/walletUtils");
 
 const { generateQrFileId } = require("../utils/qrCodeHerlper");

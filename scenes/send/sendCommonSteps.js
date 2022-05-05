@@ -8,9 +8,7 @@ const { replyMenu, mainMenuButton } = require("../../utils/btnMenuHelpers");
 const { formatTxnData } = require("../../utils/formatTxnData");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { AddressWallet } = require("cardano-wallet-js");
-const {
-  buildTransaction,
-} = require("../../utils/newWalletUtils/newWalletUtils");
+const { buildTransaction } = require("../../utils/newWalletUtils");
 const { clientBaseUrl } = require("../../utils/urls");
 const { getSessionKey } = require("../../firestoreInit");
 

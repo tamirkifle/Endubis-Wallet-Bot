@@ -2,7 +2,7 @@ const { Scenes, Composer, Markup } = require("telegraf");
 // const { getWalletById } = require("../utils/walletUtils");
 const { mainMenuButton } = require("../utils/btnMenuHelpers");
 const { formatTxnData } = require("../utils/formatTxnData");
-const { getTransactions } = require("../utils/newWalletUtils/newWalletUtils");
+const { getTransactions } = require("../utils/newWalletUtils");
 const { getWalletById } = require("../utils/walletUtils");
 
 const step1 = (ctx) => {

@@ -29,9 +29,7 @@ const { sendToUserIdScene } = require("./scenes/send/sendToUserIdScene");
 
 const bot = require("./botSession");
 const { replyMenu } = require("./utils/btnMenuHelpers");
-const {
-  createCardanoWallet,
-} = require("./utils/newWalletUtils/newWalletUtils");
+const { createCardanoWallet } = require("./utils/newWalletUtils");
 const logoutHandler = require("./handlers/logoutHandler");
 
 const throttler = telegrafThrottler();

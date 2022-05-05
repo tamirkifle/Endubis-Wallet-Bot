@@ -1,8 +1,10 @@
 const { bech32 } = require("cardano-crypto.js");
 const { WalletServer, ShelleyWallet, Seed } = require("cardano-wallet-js");
 const blake = require("blakejs");
-const testnetConfig = require("../../testnetConfig");
-const { getAddressesInfo } = require("./helpers/getAddressesInfo");
+const testnetConfig = require("../testnetConfig");
+const {
+  getAddressesInfo,
+} = require("./newWalletUtils/helpers/getAddressesInfo");
 
 require("dotenv").config();
 const walletServer = WalletServer.init(
