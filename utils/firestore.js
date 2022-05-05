@@ -13,19 +13,23 @@ const writeXpubDataToSession = async (
       return;
     }
     const sessionData = sessionDataDoc.data();
+    let XpubsInfo;
+    if (sessionData.XpubsInfo) {
+      XpubsInfo = JSON.parse(sessionData.XpubsInfo);
+    } else {
+      XpubsInfo = [];
+    }
     const loggedInXpub = accountXpub;
     await sessionRef.update({ loggedInXpub });
     const newXpubsInfo = [
-      ...sessionData.XpubsInfo.filter(
-        (xpubInfo) => xpubInfo.accountXpub !== accountXpub
-      ),
+      ...XpubsInfo.filter((xpubInfo) => xpubInfo.accountXpub !== accountXpub),
       {
         accountXpub,
         addressesInfo,
       },
     ];
     await sessionRef.update({
-      XpubsInfo: newXpubsInfo,
+      XpubsInfo: JSON.stringify(newXpubsInfo),
     });
   } catch (e) {
     console.log(e);
