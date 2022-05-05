@@ -1,15 +1,14 @@
 const { Markup } = require("telegraf");
 const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
 // const { getWalletById } = require("../utils/walletUtils");
-const {
-  getBalanceFromSession,
-} = require("../utils/newWalletUtils/newWalletUtils");
+const { getBalance } = require("../utils/newWalletUtils/newWalletUtils");
+const { getWalletById } = require("../utils/walletUtils");
 const { mainMenuHandler } = require("./mainMenuHandler");
 
 const formatWalletDataHTML = (walletBalance, name) => {
-  /*<b>Available Balance:</b> <tg-spoiler><i>${
-    wallet.balance.available.quantity / 1000000
-  } ada</i></tg-spoiler>*/
+  if (typeof walletBalance === "object") {
+    walletBalance = walletBalance.balance.total.quantity;
+  }
   return `Here's your wallet information, <b>${name}</b>:
 
 <b>Total Balance:</b> <tg-spoiler><i>${
@@ -22,13 +21,20 @@ const walletBalanceHandler = async (ctx) => {
   if (!ctx.session.loggedInXpub) {
     return mainMenuHandler(ctx);
   }
-  // const wallet = await getWalletById(ctx.session.loggedInWalletId);
-  const walletBalance = await getBalanceFromSession(ctx.session);
+  const wallet = await getWalletById(ctx.session.xpubWalletId);
+  if (wallet?.state?.status === "ready") {
+    replyMenuHTML(
+      ctx,
+      formatWalletDataHTML(wallet, ctx.session.userInfo?.first_name)
+    );
+  } else {
+    const walletBalance = await getBalance(ctx);
 
-  replyMenuHTML(
-    ctx,
-    formatWalletDataHTML(walletBalance, ctx.session.userInfo?.first_name)
-  );
+    await replyMenuHTML(
+      ctx,
+      formatWalletDataHTML(walletBalance, ctx.session.userInfo?.first_name)
+    );
+  }
 };
 
 module.exports = { walletBalanceHandler };
