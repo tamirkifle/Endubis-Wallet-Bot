@@ -1,7 +1,8 @@
-const { getAddressSummary } = require("./helpers/getAddressesInfo");
 const { bech32 } = require("cardano-crypto.js");
 const { WalletServer, ShelleyWallet, Seed } = require("cardano-wallet-js");
 const blake = require("blakejs");
+const testnetConfig = require("../../testnetConfig");
+const { getAddressesInfo } = require("./helpers/getAddressesInfo");
 
 require("dotenv").config();
 const walletServer = WalletServer.init(
@@ -9,25 +10,24 @@ const walletServer = WalletServer.init(
 );
 
 const getReceivingAddress = async (session) => {
-  const { loggedInXpub, XpubsInfo } = session;
+  let { loggedInXpub, XpubsInfo } = session;
+  XpubsInfo = JSON.parse(XpubsInfo);
   const allAddressesInfo = XpubsInfo.find(
     (xpubInfo) => xpubInfo.accountXpub === loggedInXpub
   )?.addressesInfo;
   const { externalAddressesInfo } = allAddressesInfo;
-  const allUnusedAddresses = externalAddressesInfo
-    .filter((addrInfo) => !addrInfo.isUsed)
-    .map((addrInfo) => addrInfo.address);
-  for (let index = 0; index < allUnusedAddresses.length; index++) {
-    const { isUsed } = await getAddressSummary(allUnusedAddresses[index]);
-    if (isUsed) {
-      index++;
-    } else {
-      return allUnusedAddresses[index];
+  for (const addrInfo of Object.values(externalAddressesInfo)) {
+    const unusedAddress = addrInfo.addresses.find(
+      (addr) => !addrInfo.summaries.usedAddresses.includes(addr)
+    );
+    if (unusedAddress) {
+      return unusedAddress;
     }
   }
+  throw Error("Can't find unused address");
 };
 
-const deleteWallet = async (walletId) => {};
+// const deleteWallet = async (walletId) => {};
 
 // const txnformat = {
 //   id: "id",
@@ -40,15 +40,17 @@ const deleteWallet = async (walletId) => {};
 //   status: "in_ledger" | "pending",
 // };
 
-const getTransactions = async (session) => {
-  const { loggedInXpub, XpubsInfo } = session;
-  const allAddressesInfo = XpubsInfo.find(
-    (xpubInfo) => xpubInfo.accountXpub === loggedInXpub
-  )?.addressesInfo;
+const getTransactions = async (ctx) => {
+  let { loggedInXpub } = ctx.session;
+  const allAddressesInfo = await getAddressesInfo(
+    loggedInXpub,
+    `${ctx.from.id}-${ctx.chat.id}`,
+    loggedInXpub
+  );
 
   function sortTransactions(transactions) {
-    let flattened = [];
-    transactions.forEach((txns) => txns.forEach((txn) => flattened.push(txn)));
+    let flattened = [].concat(...transactions);
+
     /*
     Txns repeat when you use multiple addresses for 
     utxos and/or when you have change from a utxo used 
@@ -78,45 +80,47 @@ const getTransactions = async (session) => {
     // });
 
     const sortedUniqueTxns = uniqueTxns.sort(
-      (a, b) => a.ctbTimeIssued - b.ctbTimeIssued
+      (a, b) => b.ctbTimeIssued - a.ctbTimeIssued
     );
     return sortedUniqueTxns;
   }
 
   const transactions = sortTransactions([
-    ...allAddressesInfo.externalAddressesInfo.map(
-      (addrInfo) => addrInfo.summary.transactions
+    ...Object.values(allAddressesInfo.externalAddressesInfo).map(
+      (addrInfo) => addrInfo.summaries.transactions
     ),
-    ...allAddressesInfo.internalAddressesInfo.map(
-      (addrInfo) => addrInfo.summary.transactions
+    ...Object.values(allAddressesInfo.internalAddressesInfo).map(
+      (addrInfo) => addrInfo.summaries.transactions
     ),
   ]);
-  const myAddresses = [
-    ...allAddressesInfo.externalAddressesInfo.map(
-      (addrInfo) => addrInfo.address
-    ),
-    ...allAddressesInfo.internalAddressesInfo.map(
-      (addrInfo) => addrInfo.address
-    ),
-  ];
+  const myAddresses = [].concat(
+    ...[
+      ...Object.values(allAddressesInfo.externalAddressesInfo).map(
+        (addrInfo) => addrInfo.summaries.usedAddresses
+      ),
+      ...Object.values(allAddressesInfo.internalAddressesInfo).map(
+        (addrInfo) => addrInfo.summaries.usedAddresses
+      ),
+    ]
+  );
   return formatTxnsToMatchCardanoWallet(transactions, myAddresses);
 };
 
 const formatTxnsToMatchCardanoWallet = (txns, myAddresses) => {
   return txns.map((txn) => {
     const myOutputs = txn.ctbOutputs.filter((output) =>
-      myAddresses.includes(output.ctaAddress)
+      myAddresses.includes(output[0])
     );
 
     const myInputs = txn.ctbInputs.filter((input) =>
-      myAddresses.includes(input.ctaAddress)
+      myAddresses.includes(input[0])
     );
     const myTotalOutputs = myOutputs.reduce(
-      (acc, output) => acc + Number(output.ctaAmount.getCoin),
+      (acc, output) => acc + Number(output[1].getCoin),
       0
     );
     const myTotalInputs = myInputs.reduce(
-      (acc, input) => acc + Number(input.ctaAmount.getCoin),
+      (acc, input) => acc + Number(input[1].getCoin),
       0
     );
 
@@ -124,7 +128,7 @@ const formatTxnsToMatchCardanoWallet = (txns, myAddresses) => {
     return {
       id: txn.ctbId,
       direction: myNet > 0 ? "incoming" : "outgoing",
-      fee: { quantity: txn.ctbFees.getCoin },
+      fee: { quantity: txn.fee },
       amount: { quantity: Math.abs(myNet) },
       inserted_at: { time: txn.ctbTimeIssued * 1000 },
       status: "in_ledger",
@@ -132,24 +136,20 @@ const formatTxnsToMatchCardanoWallet = (txns, myAddresses) => {
   });
 };
 
-const getBalanceFromSession = async (session) => {
-  const { loggedInXpub, XpubsInfo } = session;
-  if (!loggedInXpub || !XpubsInfo) {
+const getBalance = async (ctx) => {
+  const { loggedInXpub } = ctx.session;
+
+  if (!loggedInXpub) {
     throw Error("Could not get user data from session.");
   }
-  const allAddressesInfo = XpubsInfo.find(
-    (xpubInfo) => xpubInfo.accountXpub === loggedInXpub
-  )?.addressesInfo;
-  if (!allAddressesInfo) {
-    throw Error("Could not get user addresses info from session.");
-  }
-  allAddressesInfo;
-  const balance = [
-    ...allAddressesInfo.externalAddressesInfo,
-    ...allAddressesInfo.internalAddressesInfo,
-  ].reduce((acc, addrInfo) => acc + Number(addrInfo.summary.balance), 0);
 
-  return balance;
+  const addressesInfo = await getAddressesInfo(
+    loggedInXpub,
+    `${ctx.from.id}-${ctx.chat.id}`,
+    loggedInXpub
+  );
+
+  return addressesInfo.totalBalance;
 };
 
 const createCardanoWallet = async (bech32EncodedAccountXpub, walletName) => {
@@ -179,7 +179,7 @@ const getWalletById = async (walletId) => {
     const wallet = await walletServer.getShelleyWallet(walletId);
     return wallet;
   } catch (e) {
-    if (e.response.data.code === "no_such_wallet") {
+    if (e.response?.data?.code === "no_such_wallet") {
       return null;
     } else {
       throw e;
@@ -201,66 +201,30 @@ const getTtl = async () => {
 };
 
 const buildTransaction = async (wallet, amount, receiverAddress) => {
-  const ttl = getTtl();
+  const ttl = await getTtl();
   const coinSelection = await wallet.getCoinSelection(
     [receiverAddress],
     [amount]
   );
-  return Seed.buildTransaction(coinSelection, ttl);
+  if (!coinSelection) {
+    throw Error("Can not build transaction. Check the amount or address");
+  }
+  const opts = {
+    config: testnetConfig,
+  };
+  try {
+    return {
+      transaction: Seed.buildTransaction(coinSelection, ttl, opts),
+      coinSelection,
+    };
+  } catch (e) {
+    console.error(e);
+  }
 };
 
-// const h = blake2.createHash("blake2b", { digestLength: 20 });
-const blake2bHex = blake.blake2bHex(
-  Buffer.from(
-    "15b6386718dc443e08b0b2c7f79b153e2facc4fc3538bb1121fa955513e0eb0269fdebf6dff53ad78354da5e33cd891877213fa81cec6df0b1e7ae6a312e5344",
-    "hex"
-  ),
-  null,
-  20
-);
-console.log(blake2bHex);
-
-console.log(
-  getWalletId(
-    "endbs13qvpmh86s57alus497hjlxamamqtlylq7xq8kkxdvnvvgnd6hmdz6hp482mrkk65jdxjnuelu5ushq9vnrpv085vqzegth7uc5zujwcsggfnk"
-  )
-);
-// h.update(
-//   Buffer.from(
-//     "15b6386718dc443e08b0b2c7f79b153e2facc4fc3538bb1121fa955513e0eb0269fdebf6dff53ad78354da5e33cd891877213fa81cec6df0b1e7ae6a312e5344",
-//     "hex"
-//   )
-// );
-// console.log(h.digest("hex"));
-// console.log(
-//   Buffer.from(
-//     bech32
-//       .decode(
-//         "endbs13qvpmh86s57alus497hjlxamamqtlylq7xq8kkxdvnvvgnd6hmdz6hp482mrkk65jdxjnuelu5ushq9vnrpv085vqzegth7uc5zujwcsggfnk"
-//       )
-//       .data.toString("hex")
-//   )
-// );
-
-// console.log(
-//   blake2b(
-//     bech32.decode(
-//       "endbs13qvpmh86s57alus497hjlxamamqtlylq7xq8kkxdvnvvgnd6hmdz6hp482mrkk65jdxjnuelu5ushq9vnrpv085vqzegth7uc5zujwcsggfnk"
-//     ).data,
-//     160
-//   )
-// );
-
-// console.log(
-//   getWalletId(
-//     "endbs1zkmrseccm3zruz9sktrl0xc48ch6e38ux5utkyfpl2242ylqavpxnl0t7m0l2wkhsd2d5h3neky3saep875pemrd7zc70tn2xyh9x3quzyex6"
-//   )
-// );
-
 module.exports = {
-  deleteWallet,
   getReceivingAddress,
-  getBalanceFromSession,
+  getBalance,
   getTransactions,
   createCardanoWallet,
   getWalletById,
