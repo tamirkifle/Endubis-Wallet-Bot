@@ -1,7 +1,7 @@
 const { Scenes } = require("telegraf");
 // const CryptoJS = require("crypto-js");
 
-const { firestoreMiddlewareFn, getSessionKey } = require("./firestoreInit");
+const { firestoreMiddlewareFn } = require("./firestoreInit");
 const { telegrafThrottler } = require("telegraf-throttler");
 
 const { receiveScene } = require("./scenes/receiveScene");

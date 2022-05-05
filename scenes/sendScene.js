@@ -1,6 +1,5 @@
 const { Scenes, Composer, Markup } = require("telegraf");
 const { mainMenuButton } = require("../utils/btnMenuHelpers");
-const { getWalletById } = require("../utils/walletUtils");
 
 const step1 = async (ctx) => {
   ctx.reply(
