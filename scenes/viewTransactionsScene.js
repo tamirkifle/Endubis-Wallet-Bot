@@ -1,7 +1,9 @@
 const { Scenes, Composer, Markup } = require("telegraf");
-const { getWalletById } = require("../utils/walletUtils");
+// const { getWalletById } = require("../utils/walletUtils");
 const { mainMenuButton } = require("../utils/btnMenuHelpers");
 const { formatTxnData } = require("../utils/formatTxnData");
+const { getTransactions } = require("../utils/newWalletUtils");
+const { getWalletById } = require("../utils/walletUtils");
 
 const step1 = (ctx) => {
   ctx.reply(
@@ -62,21 +64,42 @@ Step 2
   - Ask for start date
 */
 
-const txnListHandler = async (ctx, { months: monthsOfTxns, direction }) => {
-  const wallet = await getWalletById(ctx.session.loggedInWalletId);
+const txnListHandler = async (
+  ctx,
+  { months: monthsOfTxns = undefined, direction } = {}
+) => {
+  // const wallet = await getWalletById(ctx.session.xpubWalletId);
+  let wallet;
+  try {
+    wallet = await getWalletById(ctx.session.xpubWalletId);
+  } catch (error) {
+    wallet = null;
+  }
   let txns;
   if (monthsOfTxns) {
     const oneMonthInMS = 2629800000;
     const endDate = new Date(Date.now());
     const startDate = new Date(Date.now() - oneMonthInMS * monthsOfTxns);
-    txns = await wallet.getTransactions(startDate, endDate);
+    if (wallet?.state?.status === "ready") {
+      txns = await wallet.getTransactions(startDate, endDate);
+    } else {
+      txns = await getTransactions(ctx);
+    }
   } else if (direction) {
-    txns = await wallet.getTransactions();
+    if (wallet?.state?.status === "ready") {
+      txns = await wallet.getTransactions();
+    } else {
+      txns = await getTransactions(ctx);
+    }
     txns = txns.filter(
       (txn) => txn.direction === String(direction).toLowerCase()
     );
   } else {
-    txns = await wallet.getTransactions();
+    if (wallet?.state?.status === "ready") {
+      txns = await wallet.getTransactions();
+    } else {
+      txns = await getTransactions(ctx);
+    }
   }
   const customInlineKeyboard = (index, txnId) => {
     if (index === txns.length - 1) {

@@ -1,11 +1,18 @@
 const { Markup } = require("telegraf");
+const { getSessionKey } = require("../firestoreInit");
+const { clientBaseUrl } = require("../utils/urls");
 
 const mainMenuHandler = async (ctx) => {
+  const createLink = `${clientBaseUrl}/create?sessionKey=${getSessionKey(ctx)}`;
+  const restoreLink = `${clientBaseUrl}/restore?sessionKey=${getSessionKey(
+    ctx
+  )}`;
+
   //If in a scene, leave it.
   ctx.scene?.leave();
 
   // await ctx.deleteMessage(goingMsg.from.id, goingMsg.message_id);
-  if (ctx.session.loggedInWalletId) {
+  if (ctx.session.loggedInXpub) {
     if (ctx.message?.text === "/start") {
       await ctx.reply(
         "👋 Welcome back to your wallet",
@@ -34,8 +41,8 @@ const mainMenuHandler = async (ctx) => {
     return ctx.replyWithHTML(
       `Please <b>CREATE</b> or <b>RESTORE</b> a wallet to get started`,
       Markup.inlineKeyboard([
-        [Markup.button.callback("🆕 Create a New Wallet", "create-wallet")],
-        [Markup.button.callback("🗝 Restore a Wallet", "restore-wallet")],
+        [Markup.button.url("🆕 Secure Create", createLink)],
+        [Markup.button.url("🗝 Secure Restore", restoreLink)],
       ])
     );
   }

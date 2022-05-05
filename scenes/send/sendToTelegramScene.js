@@ -54,14 +54,18 @@ step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
     const toSendId = (await toSendChat).id;
     const walletToSendTo = await getWalletByName(String(toSendId));
     const addresses = await walletToSendTo.getUnusedAddresses();
-    ctx.scene.state.receiverAddress = addresses.slice(0, 1)[0];
+    ctx.scene.state.receiverAddress = JSON.parse(
+      JSON.stringify(addresses.slice(0, 1)[0])
+    );
     await replyMenuHTML(
       ctx,
       `Username @<a href="tg://user?id=${toSendId}"><b>${username}</b></a> was found in our database.\nPlease enter the amount to send (in ada)`
     );
     return ctx.wizard.next();
   } catch (e) {
-    await ctx.replyWithHTML(`🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
+    await ctx.replyWithHTML(
+      `🔴 <b>ERROR</b> \n\n${e.response?.data?.message || e.message}`
+    );
     await replyMenu(
       ctx,
       `Let's try again. Please enter the telegram username or phone number of the user you want to send to`
@@ -94,7 +98,9 @@ step2.hears(phoneRegex, async (ctx) => {
       String(contactMsg.contact.user_id)
     );
     const addresses = await walletToSendTo.getUnusedAddresses();
-    ctx.scene.state.receiverAddress = addresses.slice(0, 1)[0];
+    ctx.scene.state.receiverAddress = JSON.parse(
+      JSON.stringify(addresses.slice(0, 1)[0])
+    );
     await replyMenuHTML(
       ctx,
       `User with phone <a href="tg://user?id=${contactMsg.contact.user_id}"><b>${inputPhoneNumber}</b></a> was found in our database.\nPlease enter the amount to send (in ada)`

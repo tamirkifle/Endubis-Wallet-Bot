@@ -2,6 +2,7 @@ const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { deleteWallet } = require("../../utils/walletUtils");
 const { replyMenu } = require("../../utils/btnMenuHelpers");
+const logoutHandler = require("../../handlers/logoutHandler");
 
 /*
 Steps: 
@@ -35,16 +36,14 @@ const step2 = new Composer();
 step2.hears("✅ Yes", async (ctx) => {
   await ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
   try {
-    const result = await deleteWallet(ctx.session.loggedInWalletId);
-    ctx.session.loggedInWalletId = null;
-    ctx.session.userInfo = null;
-    console.log(result);
-    replyMenu(ctx, "Wallet Successfully Deleted");
+    await deleteWallet(ctx.session.xpubWalletId);
+    await logoutHandler(ctx);
   } catch (e) {
     console.log(e);
     //TODO - Better error messages
     replyMenu(ctx, "ERROR: Something went wrong");
   }
+  replyMenu(ctx, "Wallet Successfully Deleted");
   return ctx.scene.leave();
 });
 step2.hears("❌ No", async (ctx) => {

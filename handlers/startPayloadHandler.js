@@ -17,7 +17,7 @@ const startPayloadHandler = async (ctx, next) => {
     return Scenes.Stage.enter("sendScene")(ctx);
   } else if (decodedPayload.match(/^sendto[=-](.+)/)) {
     //matches sendto with and without amount and expiry
-    if (!ctx.session.loggedInWalletId) {
+    if (!ctx.session.loggedInXpub) {
       await ctx.reply("You are not logged in.");
       return mainMenuHandler(ctx);
     }

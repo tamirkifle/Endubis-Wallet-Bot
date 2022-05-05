@@ -1,6 +1,8 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../handlers/mainMenuHandler");
-const { mainMenuButton } = require("../utils/btnMenuHelpers");
+const { mainMenuButton, replyMenuHTML } = require("../utils/btnMenuHelpers");
+const { getSessionKey } = require("../firestoreInit");
+const { clientBaseUrl } = require("../utils/urls");
 /*
 Step 1: 
 - Show Manage Account Menu
@@ -10,7 +12,7 @@ Step 1:
 */
 
 const step1 = async (ctx) => {
-  if (!ctx.session.loggedInWalletId) {
+  if (!ctx.session.xpubWalletId) {
     mainMenuHandler(ctx);
   } else {
     ctx.reply(
@@ -34,7 +36,17 @@ Step 2:
 */
 
 const step2 = new Composer();
-step2.action("change-passphrase", Scenes.Stage.enter("changePassphraseScene"));
+
+step2.action("change-passphrase", (ctx) => {
+  const changePassphraseLink = `${clientBaseUrl}/changepass?sessionKey=${getSessionKey(
+    ctx
+  )}`;
+  replyMenuHTML(
+    ctx,
+    `Note: You will need to provide your seed phrase in order to change your passphrase.\nProceed with the following link once ready.`,
+    [Markup.button.url("🗝 Change Passphrase", changePassphraseLink)]
+  );
+});
 step2.action("delete-wallet", Scenes.Stage.enter("deleteWalletScene"));
 
 const manageAccountScene = new Scenes.WizardScene(

@@ -1,5 +1,6 @@
 const { Markup } = require("telegraf");
-const { getReceivingAddress } = require("../utils/walletUtils");
+const { getReceivingAddress } = require("../utils/newWalletUtils");
+// const { getReceivingAddress } = require("../utils/walletUtils");
 const { generateQrFileId } = require("../utils/qrCodeHerlper");
 
 const sHandler = (ctx) => {
@@ -9,7 +10,7 @@ const sHandler = (ctx) => {
   });
 };
 const addrHandler = async (ctx) => {
-  const address = await getReceivingAddress(ctx.session.loggedInWalletId);
+  const address = await getReceivingAddress(ctx.session);
   const results = [
     {
       type: "article",
@@ -68,7 +69,7 @@ const qrHandler = async (ctx) => {
 };
 
 const generalInlineHandler = async (ctx) => {
-  const address = await getReceivingAddress(ctx.session.loggedInWalletId);
+  const address = await getReceivingAddress(ctx.session);
   const startPayload = Buffer.from(
     `sendto=${ctx.session.userInfo?.id}`
   ).toString("base64");
@@ -135,7 +136,7 @@ const generalWithAmountHandler = async (ctx) => {
         ctx.session.userInfo?.id
       }&amount=${amountToSend}&expiry=${Date.now()}`
     ).toString("base64");
-    const address = await getReceivingAddress(ctx.session.loggedInWalletId);
+    const address = await getReceivingAddress(ctx.session);
     const results = [
       {
         type: "article",
