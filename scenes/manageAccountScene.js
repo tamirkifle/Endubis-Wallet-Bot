@@ -12,7 +12,7 @@ Step 1:
 */
 
 const step1 = async (ctx) => {
-  if (!ctx.session.loggedInWalletId) {
+  if (!ctx.session.xpubWalletId) {
     mainMenuHandler(ctx);
   } else {
     ctx.reply(
