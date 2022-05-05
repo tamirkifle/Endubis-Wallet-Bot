@@ -1,7 +1,8 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
-const { deleteWallet } = require("../../utils/newWalletUtils/newWalletUtils");
+const { deleteWallet } = require("../../utils/walletUtils");
 const { replyMenu } = require("../../utils/btnMenuHelpers");
+const logoutHandler = require("../../handlers/logoutHandler");
 
 /*
 Steps: 
@@ -35,7 +36,8 @@ const step2 = new Composer();
 step2.hears("✅ Yes", async (ctx) => {
   await ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
   try {
-    ctx.session = null;
+    await deleteWallet(ctx.session.xpubWalletId);
+    await logoutHandler(ctx);
   } catch (e) {
     console.log(e);
     //TODO - Better error messages
