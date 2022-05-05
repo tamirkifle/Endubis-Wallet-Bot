@@ -32,6 +32,7 @@ const { replyMenu } = require("./utils/btnMenuHelpers");
 const {
   createCardanoWallet,
 } = require("./utils/newWalletUtils/newWalletUtils");
+const logoutHandler = require("./handlers/logoutHandler");
 
 const throttler = telegrafThrottler();
 bot.use(throttler);
@@ -52,15 +53,15 @@ bot.use(firestoreMiddlewareFn);
 bot.use(stage.middleware());
 bot.use(async (ctx, next) => {
   const sessionData = ctx.session;
-  if (sessionData.loggedInXpub) {
+  if (sessionData?.loggedInXpub && !sessionData?.xpubWalletId) {
     try {
       const wallet = await createCardanoWallet(
         sessionData.loggedInXpub,
-        getSessionKey(ctx)
+        String(ctx.from.id)
       );
-      ctx.session.loggedInWalletId = wallet.id;
+      ctx.session.xpubWalletId = wallet.id;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
   return next();
@@ -68,14 +69,17 @@ bot.use(async (ctx, next) => {
 
 bot.on("callback_query", async (ctx, next) => {
   try {
-    if (!ctx.session.loggedInXpub) {
+    if (
+      !ctx.session.loggedInXpub &&
+      ctx.callbackQuery?.data !== "back-to-menu"
+    ) {
       await replyMenu(
         ctx,
         "You are not logged in. Go to the Main Menu to Log In"
       );
       return ctx.answerCbQuery();
     }
-    ctx.answerCbQuery(undefined, { cache_time: 5 });
+    // ctx.answerCbQuery(undefined, { cache_time: 5 });
   } catch (e) {
     console.log(e);
   }
@@ -83,7 +87,7 @@ bot.on("callback_query", async (ctx, next) => {
 });
 
 bot.on("inline_query", (ctx, next) => {
-  if (!ctx.session.loggedInXpub) {
+  if (!ctx.session?.loggedInXpub) {
     ctx.answerInlineQuery([], {
       switch_pm_text: "Start using Endubis Wallet",
       switch_pm_parameter: "go-to-wallet",
@@ -108,17 +112,7 @@ bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
 bot.action("deposit", Scenes.Stage.enter("depositScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
-bot.action("log-out", async (ctx) => {
-  ctx.session.loggedInWalletId = null;
-  ctx.session.loggedInXpub = null;
-  ctx.session.userInfo = null;
-  try {
-    await ctx.deleteMessage();
-  } catch (error) {
-    console.log(error);
-  }
-  mainMenuHandler(ctx);
-});
+bot.action("log-out", logoutHandler);
 
 //Handles all Back to Menu clicks outside scenes
 bot.action("back-to-menu", mainMenuHandler);
