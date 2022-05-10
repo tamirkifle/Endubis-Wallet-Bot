@@ -32,6 +32,7 @@ const { replyMenu } = require("./utils/btnMenuHelpers");
 const { createCardanoWallet } = require("./utils/newWalletUtils");
 const logoutHandler = require("./handlers/logoutHandler");
 const { getSessionData } = require("./utils/firestore");
+const { deleteMessageHandler } = require("./handlers/deleteMessageHandler");
 
 const throttler = telegrafThrottler();
 bot.use(throttler);
@@ -48,8 +49,9 @@ const stage = new Scenes.Stage([
 ]);
 
 bot.use(firestoreMiddlewareFn);
-
+bot.on(["callback_query"], deleteMessageHandler);
 bot.use(stage.middleware());
+
 bot.use(async (ctx, next) => {
   const sessionData = ctx.session;
   if (sessionData?.loggedInXpub && !sessionData?.xpubWalletId) {
