@@ -31,6 +31,7 @@ const bot = require("./botSession");
 const { replyMenu } = require("./utils/btnMenuHelpers");
 const { createCardanoWallet } = require("./utils/newWalletUtils");
 const logoutHandler = require("./handlers/logoutHandler");
+const { getSessionData } = require("./utils/firestore");
 
 const throttler = telegrafThrottler();
 bot.use(throttler);
@@ -83,12 +84,14 @@ bot.on("callback_query", async (ctx, next) => {
   }
   return next();
 });
-
-bot.on("inline_query", (ctx, next) => {
-  if (!ctx.session?.loggedInXpub) {
+bot.on("inline_query", async (ctx, next) => {
+  const sessionData = await getSessionData(ctx);
+  ctx.session = sessionData;
+  if (!sessionData?.loggedInXpub) {
     ctx.answerInlineQuery([], {
       switch_pm_text: "Start using Endubis Wallet",
       switch_pm_parameter: "go-to-wallet",
+      cache_time: 0,
     });
   } else {
     next();

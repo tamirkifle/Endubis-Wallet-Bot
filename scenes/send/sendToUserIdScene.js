@@ -12,6 +12,10 @@ const {
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { formatTxnData } = require("../../utils/formatTxnData");
 const { AddressWallet } = require("cardano-wallet-js");
+const { buildTransaction } = require("../../utils/newWalletUtils");
+const { clientBaseUrl } = require("../../utils/urls");
+const { getSessionKey } = require("../../firestoreInit");
+const { writeToSession } = require("../../utils/firestore");
 
 require("dotenv").config();
 const token = process.env.TG_BOT_TOKEN;
@@ -99,40 +103,39 @@ const amountHandler = () => {
       );
       return;
     }
-    let wallet = await getWalletById(ctx.session.loggedInWalletId);
+    let wallet = await getWalletById(ctx.session.xpubWalletId);
     ctx.scene.state.wallet = JSON.parse(JSON.stringify(wallet));
 
     try {
-      const estimatedFees = await wallet.estimateFee(
-        [receiverAddress],
-        [amount]
+      const { transaction: txBuild, coinSelection } = await buildTransaction(
+        wallet,
+        amount,
+        receiverAddress
       );
-      if (estimatedFees) {
-        await ctx.reply(
-          `Your Available balance: ${
-            wallet.balance.available.quantity / 1000000
-          } ada 
+      const unsignedTx = {
+        unsignedTxHex: Buffer.from(txBuild.to_bytes()).toString("hex"),
+        time: Date.now(),
+        balance: wallet.balance.available.quantity,
+        amount,
+        fee: txBuild.fee().to_str(),
+        coinSelection: JSON.parse(JSON.stringify(coinSelection)),
+      };
+      await writeToSession(getSessionKey(ctx), "unsignedTx", unsignedTx);
+      const send = `${clientBaseUrl}/send?sessionKey=${getSessionKey(ctx)}`;
+      await ctx.reply(
+        `Your Available balance: ${
+          wallet.balance.available.quantity / 1000000
+        } ada
 Amount to Send: ${amount / 1000000} ada
-Est. Fees: ${estimatedFees.estimated_min.quantity / 1000000} ada - ${
-            estimatedFees.estimated_max.quantity / 1000000
-          } ada`,
-          Markup.inlineKeyboard([
-            [Markup.button.callback("Proceed", "proceed-txn")],
-            [mainMenuButton("Cancel")],
-          ])
-        );
-      }
-      if (ctx.session.amountToSend) {
-        return ctx.wizard.selectStep(ctx.wizard.cursor + 2);
-      }
-      return ctx.wizard.next();
-    } catch (e) {
-      await ctx.replyWithHTML(`🔴 <b>ERROR</b> \n\n${e.response.data.message}`);
-      await replyMenu(
-        ctx,
-        `Let's try again. Please enter the amount to send (in ada)`
+Est. Fees: ${txBuild.fee().to_str() / 1000000} ada`,
+        Markup.inlineKeyboard([
+          [Markup.button.url("Continue", `${send}`)],
+          [mainMenuButton("Cancel")],
+        ])
       );
-      return;
+    } catch (e) {
+      replyMenu(ctx, `${e.response?.data?.message || e.message}\n`);
+      return ctx.wizard.leave();
     }
   };
 };
