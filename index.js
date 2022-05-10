@@ -32,7 +32,9 @@ const { replyMenu } = require("./utils/btnMenuHelpers");
 const { createCardanoWallet } = require("./utils/newWalletUtils");
 const logoutHandler = require("./handlers/logoutHandler");
 const { getSessionData } = require("./utils/firestore");
-const { deleteMessageHandler } = require("./handlers/deleteMessageHandler");
+const {
+  deletePastMessagesHandler,
+} = require("./handlers/deleteMessageHandler");
 
 const throttler = telegrafThrottler();
 bot.use(throttler);
@@ -49,7 +51,9 @@ const stage = new Scenes.Stage([
 ]);
 
 bot.use(firestoreMiddlewareFn);
-bot.on(["callback_query"], deleteMessageHandler);
+bot.use(deletePastMessagesHandler);
+bot.start(startPayloadHandler, mainMenuHandler);
+bot.hears("🏠 Main Menu", mainMenuHandler);
 bot.use(stage.middleware());
 
 bot.use(async (ctx, next) => {
@@ -106,9 +110,6 @@ bot.inlineQuery(/(\d+.?\d*)/, generalWithAmountHandler);
 
 bot.on("inline_query", generalInlineHandler);
 
-bot.start(startPayloadHandler, mainMenuHandler);
-bot.hears("🏠 Main Menu", mainMenuHandler);
-
 bot.action(["wallet-balance", "refresh-balance"], walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
 bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
@@ -116,18 +117,5 @@ bot.action("deposit", Scenes.Stage.enter("depositScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", logoutHandler);
-
-//Handles all Back to Menu clicks outside scenes
-bot.action("back-to-menu", mainMenuHandler);
-
-//THis will only activate if called outside the scene: createAccountScene, eg. if a user clicks an older message with the delete button
-//So Just delete and don't try to restore the wallet
-bot.action("delete-then-restore", async (ctx) => {
-  try {
-    await ctx.deleteMessage();
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 bot.launch();

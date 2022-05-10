@@ -10,7 +10,6 @@ const step1 = async (ctx) => {
 };
 
 const step2 = new Composer();
-step2.start(mainMenuHandler);
 step2.on("photo", async (ctx) => {
   const qrcode = await ctx.telegram.getFileLink(
     ctx.message.photo[ctx.message.photo.length - 1].file_id

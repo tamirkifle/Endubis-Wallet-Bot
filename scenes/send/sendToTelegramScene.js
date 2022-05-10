@@ -28,8 +28,6 @@ Step 2
 
 */
 const step2 = new Composer();
-step2.start(mainMenuHandler);
-step2.hears("🏠 Main Menu", mainMenuHandler);
 
 step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
   let username = ctx.message.text;
@@ -45,11 +43,7 @@ step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
     console.log({ chats });
     const toSendChat = chats.find((chat) => chat.username === username);
     if (!toSendChat) {
-      throw {
-        response: {
-          data: { message: "Username doesn't exist in my database" },
-        },
-      };
+      throw Error("Username doesn't exist in my database");
     }
     const toSendId = (await toSendChat).id;
     const walletToSendTo = await getWalletByName(String(toSendId));
