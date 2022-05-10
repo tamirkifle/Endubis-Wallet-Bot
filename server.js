@@ -50,7 +50,7 @@ app.post("/connect", async (req, res) => {
       //TODO: handle invalid links (hopefully on frontend)
       const userId = userIdFromSessionKey(sessionKey);
       const userInfo = await bot.telegram.getChat(userId);
-      await writeToSession(sessionKey, { userInfo });
+      await writeToSession(sessionKey, "userInfo", userInfo);
       bot.telegram.sendMessage(
         userId,
         `🎉 You have been successfully logged in.`,

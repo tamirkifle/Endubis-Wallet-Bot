@@ -10,7 +10,11 @@ initializeApp();
 const db = getFirestore();
 const sessionDocName = "sessionsSecure";
 const getSessionKey = (ctx) =>
-  ctx.from && ctx.chat && `${ctx.from.id}-${ctx.chat.id}`;
+  ctx.from && ctx.chat
+    ? `${ctx.from.id}-${ctx.chat.id}`
+    : ctx.from
+    ? `${ctx.from.id}-${ctx.from.id}`
+    : undefined;
 const userIdFromSessionKey = (sessionKey) => sessionKey.split("-")[0];
 const firestoreMiddleware = (collectionName) =>
   firestoreSession(db.collection(collectionName));
