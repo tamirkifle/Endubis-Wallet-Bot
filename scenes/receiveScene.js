@@ -44,7 +44,7 @@ step2.action("receiving-qr", async (ctx) => {
   ).toString("base64");
   const file_id = await generateQrFileId(
     ctx,
-    `http://t.me/Testing_TM_Bot?start=${startPayload}`
+    `http://t.me/${ctx.botInfo.username}?start=${startPayload}`
   );
 
   await replyMenuPhoto(ctx, file_id, {

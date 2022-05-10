@@ -42,7 +42,7 @@ const qrHandler = async (ctx) => {
   ).toString("base64");
   const file_id = await generateQrFileId(
     ctx,
-    `http://t.me/Testing_TM_Bot?start=${startPayload}`
+    `http://t.me/${ctx.botInfo.username}?start=${startPayload}`
   );
 
   const results = [
@@ -119,7 +119,7 @@ const generalInlineHandler = async (ctx) => {
         [
           Markup.button.url(
             "Send",
-            `http://t.me/Testing_TM_Bot?start=${startPayload}`
+            `http://t.me/${ctx.botInfo.username}?start=${startPayload}`
           ),
         ],
       ]),
@@ -177,7 +177,7 @@ const generalWithAmountHandler = async (ctx) => {
                   ? `@` + ctx.session.userInfo?.username
                   : ctx.session.userInfo?.first_name
               }`,
-              `http://t.me/Testing_TM_Bot?start=${startPayload}`
+              `http://t.me/${ctx.botInfo.username}?start=${startPayload}`
             ),
           ],
         ]),
