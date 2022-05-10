@@ -21,8 +21,6 @@ Step 3
 - Show Send button
 */
   const step3 = new Composer();
-  step3.start(mainMenuHandler);
-  step3.hears("🏠 Main Menu", mainMenuHandler);
 
   step3.on("text", async (ctx) => {
     ctx.scene.state.amount = Number(ctx.message?.text) * 1000000; //to lovelace
@@ -83,13 +81,6 @@ Step 4
 
   const step4 = new Composer();
   step4.action(["txnid", "refresh-txn"], async (ctx) => {
-    if (ctx.callbackQuery.data === "refresh-txn") {
-      try {
-        await ctx.deleteMessage();
-      } catch (error) {
-        console.log(error);
-      }
-    }
     const sessionData = ctx.session;
     let wallet = sessionData.__scenes.state.wallet;
     wallet = makeShelleyWallet(wallet);

@@ -84,8 +84,6 @@ const step1 = async (ctx) => {
 };
 
 const step2 = new Composer();
-step2.start(mainMenuHandler);
-step2.hears("🏠 Main Menu", mainMenuHandler);
 
 const amountHandler = () => {
   return async (ctx) => {
@@ -161,8 +159,6 @@ Step 5
 */
 
 const step4 = new Composer();
-step4.start(mainMenuHandler);
-step4.hears("🏠 Main Menu", mainMenuHandler);
 
 step4.on("text", async (ctx) => {
   const passphrase = ctx.message?.text;
@@ -210,11 +206,7 @@ step5.action("refresh-txn", async (ctx) => {
     JSON.stringify(await wallet.getTransaction(ctx.scene.state.transaction.id))
   ); //refresh txn
   const { transaction } = ctx.scene.state;
-  try {
-    await ctx.deleteMessage();
-  } catch (error) {
-    console.log(error);
-  }
+
   if (transaction.status === "in_ledger") {
     await ctx.replyWithHTML(
       `Transaction Details:\n${formatTxnData(transaction)}`,

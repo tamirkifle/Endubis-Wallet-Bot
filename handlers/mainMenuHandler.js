@@ -11,7 +11,6 @@ const mainMenuHandler = async (ctx) => {
   //If in a scene, leave it.
   ctx.scene?.leave();
 
-  // await ctx.deleteMessage(goingMsg.from.id, goingMsg.message_id);
   if (ctx.session.loggedInXpub) {
     if (ctx.message?.text === "/start") {
       await ctx.reply(
