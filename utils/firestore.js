@@ -1,5 +1,5 @@
 /* eslint-disable node/no-missing-require */
-const { db, sessionDocName } = require("../firestoreInit");
+const { db, sessionDocName, getSessionKey } = require("../firestoreInit");
 
 const writeXpubDataToSession = async (
   sessionKey,
@@ -46,13 +46,23 @@ const getUserXpubsInfo = async (sessionKey) => {
   return sessionData.XpubsInfo;
 };
 
-const writeToSession = async (sessionKey, object) => {
+const writeToSession = async (sessionKey, key, object) => {
   const sessionRef = db.collection(sessionDocName).doc(sessionKey);
   const sessionDataDoc = await sessionRef.get();
   if (!sessionDataDoc.exists) {
     throw Error("No such user!");
   }
-  await sessionRef.update(object);
+  await sessionRef.update({ [key]: object });
+};
+
+const getSessionData = async (ctx) => {
+  const sessionKey = getSessionKey(ctx);
+  const sessionRef = db.collection(sessionDocName).doc(sessionKey);
+  const sessionDataDoc = await sessionRef.get();
+  if (!sessionDataDoc.exists) {
+    throw Error("No such user!");
+  }
+  return sessionDataDoc.data();
 };
 const checkNewUser = async (sessionKey) => {
   const userXpubsInfo = await getUserXpubsInfo(sessionKey);
@@ -66,4 +76,5 @@ module.exports = {
   checkNewUser,
   getUserXpubsInfo,
   writeToSession,
+  getSessionData,
 };
