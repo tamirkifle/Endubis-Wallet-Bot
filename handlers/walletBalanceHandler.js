@@ -22,7 +22,7 @@ const walletBalanceHandler = async (ctx) => {
   }
   const wallet = await getWalletById(ctx.session.xpubWalletId);
   if (wallet?.state?.status === "ready") {
-    replyMenuHTML(
+    await replyMenuHTML(
       ctx,
       formatWalletDataHTML(wallet, ctx.session.userInfo?.first_name)
     );

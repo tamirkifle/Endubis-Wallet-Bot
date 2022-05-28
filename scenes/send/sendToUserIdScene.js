@@ -1,8 +1,9 @@
-const { Scenes, Composer, Markup, Telegraf } = require("telegraf");
+const { Scenes, Composer, Markup } = require("telegraf");
 const {
   getWalletByName,
   getWalletById,
   makeShelleyWallet,
+  isWalletServerActive,
 } = require("../../utils/walletUtils");
 const {
   replyMenu,
@@ -16,20 +17,20 @@ const { buildTransaction } = require("../../utils/newWalletUtils");
 const { clientBaseUrl } = require("../../utils/urls");
 const { getSessionKey } = require("../../firestoreInit");
 const { writeToSession } = require("../../utils/firestore");
-
-require("dotenv").config();
-const token = process.env.TG_BOT_TOKEN;
-if (token === undefined) {
-  throw new Error("TG_BOT_TOKEN must be provided!");
-}
-
-const bot = new Telegraf(token);
+const bot = require("../../botSession");
 
 /* 
 Step 1
 - Take userid from session and ask for amount
 */
 const step1 = async (ctx) => {
+  if (!(await isWalletServerActive())) {
+    await replyMenu(
+      ctx,
+      "Server is not ready. Please try again in a few minutes.\nContact support if the issue persists."
+    );
+    return ctx.scene.leave();
+  }
   if (ctx.session.expiryTime && Date.now() > Number(ctx.session.expiryTime)) {
     //EXPIRED
     await replyMenu(ctx, "Sorry. The button you clicked has expired.");

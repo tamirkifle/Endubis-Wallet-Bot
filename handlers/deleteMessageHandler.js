@@ -1,37 +1,48 @@
-const deleteMessageHandler = async (ctx, next) => {
+const bot = require("../botSession");
+
+const deleteMessage = async (res) => {
   try {
-    await ctx.deleteMessage();
+    await bot.telegram.deleteMessage(res.chat.id, res.message_id);
   } catch (error) {
     console.error("Error deleting\n", error);
-  }
-  if (next) {
-    await next();
   }
 };
 
 const deletePastMessagesHandler = async (ctx, next) => {
-  const toDelete = ctx.session.messageIdsToDelete || [];
-  if (ctx.update.callback_query) {
-    const message_id = ctx.update.callback_query.message.message_id;
-    !toDelete.includes(message_id) && toDelete.push(message_id);
-  }
-  if (Array.isArray(toDelete)) {
-    for (let messageId of toDelete) {
-      try {
-        await ctx.deleteMessage(messageId);
-      } catch (e) {
-        console.log(e);
-      }
+  try {
+    const toDelete = ctx.session?.messageIdsToDelete || [];
+    if (ctx.callbackQuery) {
+      const message_id = ctx.callbackQuery.message.message_id;
+      !toDelete.includes(message_id) && toDelete.push(message_id);
     }
-    ctx.session.messageIdsToDelete = [];
+    if (ctx.message) {
+      const message_id = ctx.message.message_id;
+      !toDelete.includes(message_id) && toDelete.push(message_id);
+    }
+    if (Array.isArray(toDelete)) {
+      for (let [key, messageId] of Object.entries(toDelete)) {
+        try {
+          await ctx.deleteMessage(messageId);
+        } catch (e) {
+          console.log(e);
+        }
+        toDelete.splice(key, 1);
+      }
+      ctx.session.messageIdsToDelete = toDelete;
+    }
+    if (next) {
+      return next();
+    }
+    return;
+  } catch (e) {
+    console.error("Error with deletePastMessagesHandler", e);
+    if (next) {
+      return next();
+    }
   }
-  if (next) {
-    return next();
-  }
-  return;
 };
 
 module.exports = {
-  deleteMessageHandler,
+  deleteMessage,
   deletePastMessagesHandler,
 };

@@ -4,11 +4,7 @@ const app = express();
 const port = 4004;
 const bot = require("./botSession");
 const { userIdFromSessionKey } = require("./firestoreInit");
-const {
-  writeXpubDataToSession,
-  getUserXpubsInfo,
-  writeToSession,
-} = require("./utils/firestore");
+const { writeToSession } = require("./utils/firestore");
 const {
   getAddressesInfo,
 } = require("./utils/newWalletUtils/helpers/getAddressesInfo");
@@ -35,30 +31,19 @@ app.get("/", (req, res) => {
 app.post("/connect", async (req, res) => {
   const { sessionKey, bech32xPub } = req.body;
   if (sessionKey && bech32xPub) {
-    const userXpubsInfo = await getUserXpubsInfo(sessionKey);
-    const oldXpubData = userXpubsInfo.find(
-      (xpubInfo) => xpubInfo.accountXpub === bech32xPub
+    //TODO: remove this and get address list via api
+    await getAddressesInfo(bech32xPub, sessionKey);
+    //TODO: handle invalid links (hopefully on frontend)
+    const userId = userIdFromSessionKey(sessionKey);
+    const userInfo = await bot.telegram.getChat(userId);
+    await writeToSession(sessionKey, "userInfo", userInfo);
+    bot.telegram.sendMessage(
+      userId,
+      `🎉 You have been successfully logged in.`,
+      Markup.inlineKeyboard([
+        [Markup.button.callback("🏠 Go To Your Account", "back-to-menu")],
+      ])
     );
-    const addressesInfo = oldXpubData
-      ? await getAddressesInfo(bech32xPub, oldXpubData.addressesInfo)
-      : await getAddressesInfo(bech32xPub);
-
-    const userData = { accountXpub: bech32xPub, addressesInfo };
-    await writeXpubDataToSession(sessionKey, userData);
-
-    if (sessionKey) {
-      //TODO: handle invalid links (hopefully on frontend)
-      const userId = userIdFromSessionKey(sessionKey);
-      const userInfo = await bot.telegram.getChat(userId);
-      await writeToSession(sessionKey, "userInfo", userInfo);
-      bot.telegram.sendMessage(
-        userId,
-        `🎉 You have been successfully logged in.`,
-        Markup.inlineKeyboard([
-          [Markup.button.callback("🏠 Go To Your Account", "back-to-menu")],
-        ])
-      );
-    }
   }
   res.end();
 });

@@ -4,9 +4,12 @@ const {
   makeShelleyWallet,
   getTransaction,
 } = require("../../utils/walletUtils");
-const { replyMenu, mainMenuButton } = require("../../utils/btnMenuHelpers");
+const {
+  replyMenu,
+  replyMenuHTML,
+  mainMenuButton,
+} = require("../../utils/btnMenuHelpers");
 const { formatTxnData } = require("../../utils/formatTxnData");
-const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { AddressWallet } = require("cardano-wallet-js");
 const { buildTransaction } = require("../../utils/newWalletUtils");
 const { clientBaseUrl } = require("../../utils/urls");
@@ -28,13 +31,26 @@ Step 3
     receiverAddress = new AddressWallet(receiverAddress.id);
 
     if (!amount) {
-      replyMenu(
+      await replyMenu(
         ctx,
         "Invalid Entry, Try again.\n\nPlease enter the amount to send (in ada)"
       );
       return;
     }
     let wallet = await getWalletById(ctx.session.xpubWalletId);
+    if (!wallet) {
+      await replyMenuHTML(
+        ctx,
+        "Server is not ready. Please try again in a few minutes.\nContact support if the issue persists."
+      );
+      return ctx.scene.leave();
+    } else if (!(wallet.state?.status === "ready")) {
+      await replyMenuHTML(
+        ctx,
+        "Wallet is not ready. Try again in a few minutes."
+      );
+      return ctx.scene.leave();
+    }
     ctx.scene.state.wallet = JSON.parse(JSON.stringify(wallet));
     try {
       const { transaction: txBuild, coinSelection } = await buildTransaction(
@@ -51,16 +67,19 @@ Step 3
         coinSelection: JSON.parse(JSON.stringify(coinSelection)),
       };
       const send = `${clientBaseUrl}/send?sessionKey=${getSessionKey(ctx)}`;
-      await ctx.reply(
+      await replyMenuHTML(
+        ctx,
         `Your Available balance: ${
           wallet.balance.available.quantity / 1000000
         } ada
 Amount to Send: ${amount / 1000000} ada
 Est. Fees: ${txBuild.fee().to_str() / 1000000} ada`,
-        Markup.inlineKeyboard([
-          [Markup.button.url("Continue", `${send}`)],
-          [mainMenuButton("Cancel")],
-        ])
+        {
+          ...Markup.inlineKeyboard([
+            [Markup.button.url("Continue", `${send}`)],
+          ]),
+          menuText: "Cancel",
+        }
       );
     } catch (e) {
       replyMenu(
@@ -90,13 +109,20 @@ Step 4
         sessionData.transactionId
       );
       if (transaction.status === "in_ledger") {
-        await ctx.replyWithHTML(
+        await replyMenuHTML(
+          ctx,
           `Transaction Details:\n${formatTxnData(transaction)}`,
-          Markup.inlineKeyboard([[mainMenuButton()]])
+          [
+            Markup.button.url(
+              "More Details",
+              `https://testnet.cardanoscan.io/transaction/${transaction.id}`
+            ),
+          ]
         );
         return ctx.scene.leave();
       }
-      ctx.replyWithHTML(
+      await replyMenuHTML(
+        ctx,
         `Transaction Details: 
   ${formatTxnData(transaction)}`,
         Markup.inlineKeyboard([
@@ -112,7 +138,8 @@ Step 4
       );
     } catch (e) {
       if (e.response?.data?.code === "no_such_transaction") {
-        await ctx.replyWithHTML(
+        await replyMenuHTML(
+          ctx,
           `Transaction Details: 
 Transaction ID: ${sessionData.transactionId}
 Status: Pending`,
@@ -124,7 +151,6 @@ Status: Pending`,
                 `https://testnet.cardanoscan.io/transaction/${sessionData.transactionId}`
               ),
             ],
-            [mainMenuButton()],
           ])
         );
       }

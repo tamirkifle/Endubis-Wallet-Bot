@@ -1,8 +1,12 @@
 const { Scenes, Markup, Composer } = require("telegraf");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { deleteWallet } = require("../../utils/walletUtils");
-const { replyMenu } = require("../../utils/btnMenuHelpers");
-const logoutHandler = require("../../handlers/logoutHandler");
+const {
+  replyMenu,
+  replyText,
+  replyHTML,
+} = require("../../utils/btnMenuHelpers");
+const { deleteMessage } = require("../../handlers/deleteMessageHandler");
 
 /*
 Steps: 
@@ -18,7 +22,8 @@ Step 1:
 */
 
 const step1 = (ctx) => {
-  ctx.replyWithHTML(
+  replyHTML(
+    ctx,
     `Are you sure you want to <b>delete</b> this wallet from our database.\nThe wallet will still be available on the blockchain`,
     Markup.keyboard([["✅ Yes"], ["❌ No"]])
       .oneTime()
@@ -34,20 +39,32 @@ Step 2:
 */
 const step2 = new Composer();
 step2.hears("✅ Yes", async (ctx) => {
-  await ctx.reply("Deleting Wallet...", Markup.removeKeyboard());
+  const deletingReply = await replyText(
+    ctx,
+    "Deleting Wallet...",
+    Markup.removeKeyboard()
+  );
   try {
     await deleteWallet(ctx.session.xpubWalletId);
-    await logoutHandler(ctx);
+    await deleteMessage(deletingReply);
+    await replyMenu(ctx, "Wallet Successfully Deleted");
+    const { messageIdsToDelete } = ctx.session;
+    ctx.session = null;
+    ctx.session.messageIdsToDelete = messageIdsToDelete;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     //TODO - Better error messages
-    replyMenu(ctx, "ERROR: Something went wrong");
+    await replyMenu(ctx, "ERROR: Something went wrong");
   }
-  replyMenu(ctx, "Wallet Successfully Deleted");
   return ctx.scene.leave();
 });
 step2.hears("❌ No", async (ctx) => {
-  await ctx.reply("Aborting...", Markup.keyboard([["🏠 Main Menu"]]).resize());
+  const abortReply = await replyMenu(
+    ctx,
+    "Aborting...",
+    Markup.keyboard([["🏠 Main Menu"]]).resize()
+  );
+  await deleteMessage(abortReply);
 
   return mainMenuHandler(ctx);
 });
