@@ -52,10 +52,11 @@ const stage = new Scenes.Stage([
 
 bot.use(firestoreMiddlewareFn);
 bot.use(deletePastMessagesHandler);
-bot.start(startPayloadHandler, mainMenuHandler);
+bot.start(mainMenuHandler);
 bot.hears("🏠 Main Menu", mainMenuHandler);
 bot.action("back-to-menu", mainMenuHandler);
 bot.use(stage.middleware());
+bot.start(startPayloadHandler);
 
 bot.use(async (ctx, next) => {
   const sessionData = ctx.session;
