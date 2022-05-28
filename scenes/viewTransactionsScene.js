@@ -189,7 +189,7 @@ const pageHandler = async (ctx) => {
 const step1 = new Composer();
 step1.action("txns-by-time", goToTxnByTimeMenu);
 step1.action("txns-sent", txnListHandler({ direction: "outgoing" }));
-step1.action("txns-received", txnListHandler({ direction: "outgoing" }));
+step1.action("txns-received", txnListHandler({ direction: "incoming" }));
 step1.action("txns-all", txnListHandler());
 step1.action(["previous-page", "next-page"], pageHandler);
 step1.action(["back-to-previous-menu", "view-transactions"], goToTxnMainMenu);
