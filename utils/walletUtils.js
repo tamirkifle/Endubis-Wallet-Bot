@@ -12,6 +12,9 @@ let walletServer = WalletServer.init(
   process.env.WALLET_SERVER_URL || "http://localhost:8090/v2"
 );
 
+const timeout = (prom, time) =>
+  Promise.race([prom, new Promise((_r, rej) => setTimeout(rej, time))]);
+
 const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
   const seedArray = Seed.toMnemonicList(seedPhrases);
   const wallet = await walletServer.createOrRestoreShelleyWallet(
@@ -24,26 +27,35 @@ const loadAccountFromSeed = async (seedPhrases, passphrase, walletName) => {
 
 const getWalletById = async (walletId) => {
   try {
-    const wallet = await walletServer.getShelleyWallet(walletId);
+    const wallet = await timeout(walletServer.getShelleyWallet(walletId), 4000);
     return wallet;
   } catch (e) {
-    console.log(e.message);
-    if (e.response?.data?.code === "no_such_wallet") {
-      return null;
-    } else {
-      throw e;
-    }
+    console.error(e?.message);
+    return null;
   }
 };
 
 const getWalletByName = async (walletName) => {
-  let wallets = await walletServer.wallets();
-  let foundWallet = wallets.find((wallet) => wallet.name === walletName);
-  return foundWallet;
+  try {
+    let wallets = await timeout(walletServer.wallets(), 4000);
+    let foundWallet = wallets.find((wallet) => wallet.name === walletName);
+    return foundWallet;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 };
 
+const isWalletServerActive = async () => {
+  try {
+    await timeout(walletServer.wallets(), 4000);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 const listWallets = async () => {
-  let wallets = await walletServer.wallets();
+  let wallets = await timeout(walletServer.wallets(), 4000);
   console.log(
     wallets.map((w) => ({
       id: w.id,
@@ -67,19 +79,19 @@ const listWallets = async () => {
 // };
 
 const getReceivingAddress = async (walletId) => {
-  const wallet = await getWalletById(walletId);
+  const wallet = await timeout(getWalletById(walletId), 4000);
   const addresses = await wallet.getUnusedAddresses();
   return addresses.slice(0, 1)[0].id;
 };
 
 const changePassphrase = async (walletId, oldPassphrase, newPassphrase) => {
-  const wallet = await getWalletById(walletId);
+  const wallet = await timeout(getWalletById(walletId), 4000);
   const result = await wallet.updatePassphrase(oldPassphrase, newPassphrase);
   return result;
 };
 
 const deleteWallet = async (walletId) => {
-  const wallet = await getWalletById(walletId);
+  const wallet = await timeout(getWalletById(walletId), 4000);
   const result = await wallet.delete();
   return result;
 };
@@ -166,4 +178,5 @@ module.exports = {
   makeShelleyWallet,
   generateSeed,
   getTransaction,
+  isWalletServerActive,
 };

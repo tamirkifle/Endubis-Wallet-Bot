@@ -1,5 +1,6 @@
 const { Markup } = require("telegraf");
 const { getSessionKey } = require("../firestoreInit");
+const { replyText, replyHTML } = require("../utils/btnMenuHelpers");
 const { clientBaseUrl } = require("../utils/urls");
 
 const mainMenuHandler = async (ctx) => {
@@ -13,12 +14,14 @@ const mainMenuHandler = async (ctx) => {
 
   if (ctx.session.loggedInXpub) {
     if (ctx.message?.text === "/start") {
-      await ctx.reply(
+      await replyText(
+        ctx,
         "👋 Welcome back to your wallet",
         Markup.keyboard([["🏠 Main Menu"]]).resize()
       );
     }
-    return ctx.replyWithHTML(
+    return replyHTML(
+      ctx,
       `Please choose an option, <b><a href="tg://user?id=${ctx.session.userInfo?.id}">${ctx.session.userInfo?.first_name}</a></b>`,
       Markup.inlineKeyboard([
         [Markup.button.callback(" 👁️‍🗨️ View Balance", "wallet-balance")],
@@ -33,11 +36,13 @@ const mainMenuHandler = async (ctx) => {
       ])
     );
   } else {
-    await ctx.reply(
+    await replyText(
+      ctx,
       "Welcome to the Endubis Wallet 🛅",
       Markup.keyboard([["🏠 Main Menu"]]).resize()
     );
-    return ctx.replyWithHTML(
+    return replyHTML(
+      ctx,
       `Please <b>CREATE</b> or <b>RESTORE</b> a wallet to get started`,
       Markup.inlineKeyboard([
         [Markup.button.url("🆕 Secure Create", createLink)],

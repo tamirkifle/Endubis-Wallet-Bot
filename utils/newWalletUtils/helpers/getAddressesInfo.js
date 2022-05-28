@@ -99,7 +99,7 @@ const getAddressSummaries = async (addresses) => {
 
 const ADDRESS_POOL_GAP = 20;
 // Generate all used external addresses and ADDRESS_POOL_GAP amount of unused
-const getAddressesInfo = async (accountXpub, sessionKey, loggedInXpub) => {
+const getAddressesInfo = async (accountXpub, sessionKey) => {
   let externalIndexCounter = 0,
     internalIndexCounter = 0;
   let externalAddressesInfo = {},
@@ -138,7 +138,12 @@ const getAddressesInfo = async (accountXpub, sessionKey, loggedInXpub) => {
       startingIndex,
       ADDRESS_POOL_GAP
     );
-    const summaries = await getAddressSummaries(externalAddresses);
+    let summaries;
+    try {
+      summaries = await getAddressSummaries(externalAddresses);
+    } catch (e) {
+      console.error(e);
+    }
     conseqUnused = externalAddresses.reduce((acc, address) => {
       if (summaries.usedAddresses.includes(address)) {
         return 0;
@@ -186,9 +191,9 @@ const getAddressesInfo = async (accountXpub, sessionKey, loggedInXpub) => {
       ),
     0
   );
-  if (sessionKey && loggedInXpub) {
+  if (sessionKey && accountXpub) {
     await writeXpubDataToSession(sessionKey, {
-      accountXpub: loggedInXpub,
+      accountXpub,
       addressesInfo,
     });
   }

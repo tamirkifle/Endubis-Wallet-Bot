@@ -2,14 +2,13 @@ const { Scenes, Composer } = require("telegraf");
 const { replyMenu } = require("../../utils/btnMenuHelpers");
 const { AddressWallet } = require("cardano-wallet-js");
 const { sendCommonSteps } = require("./sendCommonSteps");
-const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
 /* 
 Step 1
 - Ask for address
 */
 const step1 = async (ctx) => {
-  replyMenu(ctx, `Please enter the address you want to send to`);
+  await replyMenu(ctx, `Please enter the address you want to send to`);
   return ctx.wizard.next();
 };
 
@@ -29,7 +28,7 @@ step2.on("text", async (ctx) => {
   ctx.scene.state.receiverAddress = JSON.parse(
     JSON.stringify(new AddressWallet(addrToSendTo))
   );
-  replyMenu(ctx, "Please enter the amount to send (in ada)");
+  await replyMenu(ctx, "Please enter the amount to send (in ada)");
   return ctx.wizard.next();
 });
 

@@ -50,9 +50,9 @@ const writeToSession = async (sessionKey, key, object) => {
   const sessionRef = db.collection(sessionDocName).doc(sessionKey);
   const sessionDataDoc = await sessionRef.get();
   if (!sessionDataDoc.exists) {
-    throw Error("No such user!");
+    return await sessionRef.set({ [key]: object }, { merge: true });
   }
-  await sessionRef.update({ [key]: object });
+  return await sessionRef.update({ [key]: object });
 };
 
 const getSessionData = async (ctx) => {

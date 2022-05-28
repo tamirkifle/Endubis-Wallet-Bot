@@ -1,8 +1,11 @@
 const { Scenes, Composer } = require("telegraf");
-const { listWallets, getWalletByName } = require("../../utils/walletUtils");
+const {
+  listWallets,
+  getWalletByName,
+  isWalletServerActive,
+} = require("../../utils/walletUtils");
 const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
 const { sendCommonSteps } = require("./sendCommonSteps");
-const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 
 const bot = require("../../botSession");
 
@@ -11,7 +14,15 @@ Step 1
 - Ask for telegram username
 */
 const step1 = async (ctx) => {
-  replyMenu(
+  if (!(await isWalletServerActive())) {
+    await replyMenu(
+      ctx,
+      "Server is not ready. Please try again in a few minutes.\nContact support if the issue persists."
+    );
+    await ctx.wizard.next();
+    return ctx.scene.leave();
+  }
+  await replyMenu(
     ctx,
     `Please enter the telegram username or the phone number (with country code) of the user you want to send to`
   );
@@ -57,12 +68,11 @@ step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
     );
     return ctx.wizard.next();
   } catch (e) {
-    await ctx.replyWithHTML(
-      `🔴 <b>ERROR</b> \n\n${e.response?.data?.message || e.message}`
-    );
-    await replyMenu(
+    await replyMenuHTML(
       ctx,
-      `Let's try again. Please enter the telegram username or phone number of the user you want to send to`
+      `🔴 <b>ERROR</b> \n\n${
+        e.response?.data?.message || e.message
+      }\nLet's try again. Please enter the telegram username or phone number of the user you want to send to`
     );
     return;
   }
@@ -80,11 +90,9 @@ step2.hears(phoneRegex, async (ctx) => {
     " "
   );
   if (!contactMsg.contact.user_id) {
-    await ctx.replyWithHTML(
-      `🔴 <b>ERROR</b> \n\nThis user doesn't exist in my database`
-    );
-    await ctx.reply(
-      `Let's try again. Please enter the telegram username or phone number of the user you want to send to`
+    await replyMenuHTML(
+      ctx,
+      `🔴 <b>ERROR</b> \n\nThis user doesn't exist in my database\nLet's try again. Please enter the telegram username or phone number of the user you want to send to`
     );
     return;
   } else {
@@ -103,12 +111,9 @@ step2.hears(phoneRegex, async (ctx) => {
   }
 });
 step2.on("text", async (ctx) => {
-  await ctx.replyWithHTML(
-    `🔴 <b>ERROR</b> \n\nThis is not a valid username or phone number`
-  );
-  await replyMenu(
+  await replyMenuHTML(
     ctx,
-    `Let's try again. Please enter the telegram username or phone number of the user you want to send to`
+    `🔴 <b>ERROR</b> \n\nThis is not a valid username or phone number\nLet's try again. Please enter the telegram username or phone number of the user you want to send to`
   );
   return;
 });

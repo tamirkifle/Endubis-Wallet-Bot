@@ -5,6 +5,7 @@ const testnetConfig = require("../testnetConfig");
 const {
   getAddressesInfo,
 } = require("./newWalletUtils/helpers/getAddressesInfo");
+const { getSessionKey } = require("../firestoreInit");
 
 require("dotenv").config();
 const walletServer = WalletServer.init(
@@ -46,8 +47,7 @@ const getTransactions = async (ctx) => {
   let { loggedInXpub } = ctx.session;
   const allAddressesInfo = await getAddressesInfo(
     loggedInXpub,
-    `${ctx.from.id}-${ctx.chat.id}`,
-    loggedInXpub
+    getSessionKey(ctx)
   );
 
   function sortTransactions(transactions) {
@@ -147,12 +147,14 @@ const getBalance = async (ctx) => {
 
   const addressesInfo = await getAddressesInfo(
     loggedInXpub,
-    `${ctx.from.id}-${ctx.chat.id}`,
-    loggedInXpub
+    getSessionKey(ctx)
   );
 
   return addressesInfo.totalBalance;
 };
+
+const timeout = (prom, time) =>
+  Promise.race([prom, new Promise((_r, rej) => setTimeout(rej, time))]);
 
 const createCardanoWallet = async (bech32EncodedAccountXpub, walletName) => {
   const payload = {
@@ -162,7 +164,10 @@ const createCardanoWallet = async (bech32EncodedAccountXpub, walletName) => {
       .data.toString("hex"),
   };
   try {
-    const res = await walletServer.walletsApi.postWallet(payload);
+    const res = await timeout(
+      walletServer.walletsApi.postWallet(payload),
+      4000
+    );
     const apiWallet = res.data;
     return ShelleyWallet.from(apiWallet, this.config);
   } catch (e) {
@@ -171,7 +176,7 @@ const createCardanoWallet = async (bech32EncodedAccountXpub, walletName) => {
         getWalletId(bech32EncodedAccountXpub)
       );
     } else {
-      throw e;
+      return null;
     }
   }
 };
