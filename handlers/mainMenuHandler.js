@@ -3,7 +3,10 @@ const { getSessionKey } = require("../firestoreInit");
 const { replyText, replyHTML } = require("../utils/btnMenuHelpers");
 const { clientBaseUrl } = require("../utils/urls");
 
-const mainMenuHandler = async (ctx) => {
+const mainMenuHandler = async (ctx, next) => {
+  if (ctx.startPayload) {
+    return next();
+  }
   const createLink = `${clientBaseUrl}/create?sessionKey=${getSessionKey(ctx)}`;
   const restoreLink = `${clientBaseUrl}/restore?sessionKey=${getSessionKey(
     ctx

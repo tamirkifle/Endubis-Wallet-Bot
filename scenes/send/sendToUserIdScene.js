@@ -9,6 +9,7 @@ const {
   replyMenu,
   replyMenuHTML,
   mainMenuButton,
+  replyHTML,
 } = require("../../utils/btnMenuHelpers");
 const { mainMenuHandler } = require("../../handlers/mainMenuHandler");
 const { formatTxnData } = require("../../utils/formatTxnData");
@@ -36,7 +37,8 @@ const step1 = async (ctx) => {
     await replyMenu(ctx, "Sorry. The button you clicked has expired.");
     return ctx.scene.leave();
   } else if (ctx.session.expiryTime) {
-    ctx.replyWithHTML(
+    replyHTML(
+      ctx,
       `<i><b>Note: Link expires in 00:${String(
         Math.floor((ctx.session.expiryTime - Date.now()) / 60000)
       ).padStart(2, 0)}:${String(
@@ -57,7 +59,8 @@ const step1 = async (ctx) => {
     );
     const userInfo = await bot.telegram.getChat(toSendId);
     if (ctx.session.amountToSend) {
-      await ctx.replyWithHTML(
+      await replyHTML(
+        ctx,
         `User <a href="tg://user?id=${toSendId}"><b>${
           userInfo.username ? `@` + userInfo.username + ` - ` : ``
         }${userInfo.first_name}${
@@ -119,7 +122,8 @@ const amountHandler = () => {
         fee: txBuild.fee().to_str(),
         coinSelection: JSON.parse(JSON.stringify(coinSelection)),
       };
-      await writeToSession(getSessionKey(ctx), "unsignedTx", unsignedTx);
+      // await writeToSession(getSessionKey(ctx), "unsignedTx", unsignedTx);
+      ctx.session.unsignedTx = unsignedTx;
       const send = `${clientBaseUrl}/send?sessionKey=${getSessionKey(ctx)}`;
       await ctx.reply(
         `Your Available balance: ${

@@ -9,6 +9,9 @@ const deleteMessage = async (res) => {
 };
 
 const deletePastMessagesHandler = async (ctx, next) => {
+  if (ctx.updateType === "inline_query") {
+    return next();
+  }
   try {
     const toDelete = ctx.session?.messageIdsToDelete || [];
     if (ctx.callbackQuery) {
@@ -28,7 +31,9 @@ const deletePastMessagesHandler = async (ctx, next) => {
         }
         toDelete.splice(key, 1);
       }
-      ctx.session.messageIdsToDelete = toDelete;
+      if (ctx.session) {
+        ctx.session.messageIdsToDelete = toDelete;
+      }
     }
     if (next) {
       return next();
