@@ -174,6 +174,27 @@ const replyMenuPhoto = async (ctx, photo, otherOptions = {}) => {
   }
   return res;
 };
+
+const replyWithContact = async (ctx, phoneNumber, firstName, otherOptions) => {
+  const res = await ctx.telegram.sendContact(
+    ctx.from.id,
+    phoneNumber,
+    firstName || " ",
+    otherOptions
+  );
+  if (res?.message_id) {
+    ctx.session.messageIdsToDelete = [
+      ...(ctx.session.messageIdsToDelete || []),
+      res.message_id,
+    ];
+    await writeToSession(
+      getSessionKey(ctx),
+      "messageIdsToDelete",
+      ctx.session.messageIdsToDelete
+    );
+  }
+  return res;
+};
 module.exports = {
   replyMenu,
   replyMenuMDV2,
@@ -182,4 +203,5 @@ module.exports = {
   mainMenuButton,
   replyText,
   replyHTML,
+  replyWithContact,
 };

@@ -4,7 +4,11 @@ const {
   getWalletByName,
   isWalletServerActive,
 } = require("../../utils/walletUtils");
-const { replyMenu, replyMenuHTML } = require("../../utils/btnMenuHelpers");
+const {
+  replyMenu,
+  replyMenuHTML,
+  replyWithContact,
+} = require("../../utils/btnMenuHelpers");
 const { sendCommonSteps } = require("./sendCommonSteps");
 
 const bot = require("../../botSession");
@@ -51,7 +55,6 @@ step2.hears(/^@?[a-zA-Z][a-zA-Z0-9_]{4}[a-zA-Z0-9_]*$/, async (ctx) => {
     .map((chat_id) => bot.telegram.getChat(chat_id));
   try {
     chats = await Promise.all(chats);
-    console.log({ chats });
     const toSendChat = chats.find((chat) => chat.username === username);
     if (!toSendChat) {
       throw Error("Username doesn't exist in my database");
@@ -84,30 +87,48 @@ step2.hears(phoneRegex, async (ctx) => {
   const inputPhoneNumber = ctx.message.text
     .replaceAll(" ", "")
     .replaceAll("-", "");
-  const contactMsg = await ctx.telegram.sendContact(
-    ctx.from.id,
-    ctx.message.text,
-    " "
-  );
-  if (!contactMsg.contact.user_id) {
+  const contactMsg = await replyWithContact(ctx, ctx.message.text);
+  if (!contactMsg.contact?.user_id) {
     await replyMenuHTML(
       ctx,
       `🔴 <b>ERROR</b> \n\nThis user doesn't exist in my database\nLet's try again. Please enter the telegram username or phone number of the user you want to send to`
     );
     return;
   } else {
-    const walletToSendTo = await getWalletByName(
-      String(contactMsg.contact.user_id)
+    const toSendUserId = contactMsg.contact.user_id;
+    const registeredUserIds = (await listWallets()).map(
+      (wallet) => wallet.name
     );
-    const addresses = await walletToSendTo.getUnusedAddresses();
-    ctx.scene.state.receiverAddress = JSON.parse(
-      JSON.stringify(addresses.slice(0, 1)[0])
-    );
-    await replyMenuHTML(
-      ctx,
-      `User with phone <a href="tg://user?id=${contactMsg.contact.user_id}"><b>${inputPhoneNumber}</b></a> was found in our database.\nPlease enter the amount to send (in ada)`
-    );
-    return ctx.wizard.next();
+    if (!registeredUserIds.includes(String(toSendUserId))) {
+      await replyMenuHTML(
+        ctx,
+        `🔴 <b>ERROR</b> \n\nThis user doesn't exist in my database\nLet's try again. Please enter the telegram username or phone number of the user you want to send to`
+      );
+      return;
+    }
+
+    try {
+      const walletToSendTo = await getWalletByName(
+        String(contactMsg.contact.user_id)
+      );
+      const addresses = await walletToSendTo.getUnusedAddresses();
+      ctx.scene.state.receiverAddress = JSON.parse(
+        JSON.stringify(addresses.slice(0, 1)[0])
+      );
+      await replyMenuHTML(
+        ctx,
+        `User with phone <a href="tg://user?id=${contactMsg.contact.user_id}"><b>${inputPhoneNumber}</b></a> was found in our database.\nPlease enter the amount to send (in ada)`
+      );
+      return ctx.wizard.next();
+    } catch (e) {
+      await replyMenuHTML(
+        ctx,
+        `🔴 <b>ERROR</b> \n\n${
+          e.response?.data?.message || e.message
+        }\nLet's try again. Please enter the telegram username or phone number of the user you want to send to`
+      );
+      return;
+    }
   }
 });
 step2.on("text", async (ctx) => {
