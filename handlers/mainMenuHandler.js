@@ -13,7 +13,9 @@ const mainMenuHandler = async (ctx, next) => {
   )}`;
 
   //If in a scene, leave it.
-  ctx.scene?.leave();
+  // ctx.scene?.leave();
+  //Manually leaving scenes because it might be called before the stage middleware
+  ctx.session.__scenes = {};
 
   if (ctx.session.loggedInXpub) {
     if (ctx.message?.text === "/start") {

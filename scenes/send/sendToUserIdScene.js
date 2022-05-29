@@ -122,8 +122,7 @@ const amountHandler = () => {
         fee: txBuild.fee().to_str(),
         coinSelection: JSON.parse(JSON.stringify(coinSelection)),
       };
-      // await writeToSession(getSessionKey(ctx), "unsignedTx", unsignedTx);
-      ctx.session.unsignedTx = unsignedTx;
+      await writeToSession(getSessionKey(ctx), "unsignedTx", unsignedTx);
       const send = `${clientBaseUrl}/send?sessionKey=${getSessionKey(ctx)}`;
       await ctx.reply(
         `Your Available balance: ${
