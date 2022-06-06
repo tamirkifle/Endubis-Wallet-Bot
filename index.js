@@ -35,6 +35,7 @@ const { getSessionData } = require("./utils/firestore");
 const {
   deletePastMessagesHandler,
 } = require("./handlers/deleteMessageHandler");
+const { withdrawScene } = require("./scenes/withdrawScene");
 
 const throttler = telegrafThrottler();
 bot.use(throttler);
@@ -48,6 +49,7 @@ const stage = new Scenes.Stage([
   sendToAddressScene,
   sendToTelegramScene,
   sendToUserIdScene,
+  withdrawScene,
 ]);
 
 bot.use(firestoreMiddlewareFn);
@@ -114,6 +116,7 @@ bot.action(["wallet-balance", "refresh-balance"], walletBalanceHandler);
 bot.action("receive", Scenes.Stage.enter("receiveScene"));
 bot.action(["send", "refresh-send"], Scenes.Stage.enter("sendScene"));
 bot.action("deposit", Scenes.Stage.enter("depositScene"));
+bot.action("withdraw", Scenes.Stage.enter("withdrawScene"));
 bot.action("manage-account", Scenes.Stage.enter("manageAccountScene"));
 bot.action("view-transactions", Scenes.Stage.enter("viewTransactionsScene"));
 bot.action("log-out", logoutHandler);

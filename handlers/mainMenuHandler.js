@@ -35,6 +35,7 @@ const mainMenuHandler = async (ctx, next) => {
           Markup.button.callback("💸 Send", "send"),
         ],
         [Markup.button.callback("💳 Buy", "deposit")],
+        [Markup.button.callback("🏧 Withdrawals", "withdraw")],
         [Markup.button.callback("📒 Transaction History", "view-transactions")],
         [Markup.button.callback(" ⚙️ Manage Account", "manage-account")],
         [Markup.button.callback("🚪 Logout", "log-out")],
