@@ -1,8 +1,8 @@
-# Endubis wallet bot
+# Endubis Wallet Bot
 
 A very simple Cardano wallet running as a telegram bot.
 
-# Some disclaimers before we start
+# Some disclaimers
 
 Endubis Wallet is not created by Cardano Foundation, Emurgo, or IOHK. The official Cardano team has not reviewed this code and is not responsible for any damage it may cause you. Please be aware that if your device is compromised, your mnemonic may be leaked when used as the access method on Endubis Wallet. We appreciate feedback, especially a review of the crypto-related code.
 
