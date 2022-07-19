@@ -2,7 +2,11 @@ const { derivePublic: deriveChildXpub } = require("cardano-crypto.js");
 
 const derivedXpubs = {};
 
-const getCryptoProvider = async (config, accountXpubBuffer) => {
+const getCryptoProvider = async (
+  config,
+  accountXpubBuffer,
+  memoKeyIdentifier
+) => {
   const getType = () => "WALLET_SECRET";
   const getDerivationScheme = () => config.derivationScheme;
   const getVersion = () => null;
@@ -18,7 +22,7 @@ const getCryptoProvider = async (config, accountXpubBuffer) => {
 
   function CachedDeriveXpubFactory(derivationScheme) {
     async function deriveXpub(absDerivationPath) {
-      const memoKey = JSON.stringify(absDerivationPath);
+      const memoKey = memoKeyIdentifier + JSON.stringify(absDerivationPath);
 
       if (!derivedXpubs[memoKey]) {
         const deriveHardened =

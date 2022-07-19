@@ -108,7 +108,11 @@ const getAddressesInfo = async (accountXpub, sessionKey) => {
   // Decode the bech32 encoded accounXpub
   const accountXpubBuffer = bech32.decode(accountXpub).data;
   const config = getConfig();
-  const cryptoProvider = await getCryptoProvider(config, accountXpubBuffer);
+  const cryptoProvider = await getCryptoProvider(
+    config,
+    accountXpubBuffer,
+    accountXpub
+  );
   const externalGenerator = AddressGeneratorFactory(cryptoProvider, 0);
   const internalGenerator = AddressGeneratorFactory(cryptoProvider, 1);
 
