@@ -8,11 +8,11 @@ const mainMenuButton = (btnText = "Main Menu") => {
 
 const replyText = async (ctx, text, otherOptions = {}) => {
   const res = await ctx.reply(text, otherOptions);
-  let deleteAfter = true;
-  if (otherOptions.deleteAfter) {
-    deleteAfter = otherOptions.deleteAfter;
+  let keepMessages = false;
+  if (otherOptions.keepMessages) {
+    keepMessages = otherOptions.keepMessages;
   }
-  if (deleteAfter && res?.message_id) {
+  if (!keepMessages && res?.message_id) {
     ctx.session.messageIdsToDelete = [
       ...(ctx.session.messageIdsToDelete || []),
       res.message_id,
@@ -28,11 +28,11 @@ const replyText = async (ctx, text, otherOptions = {}) => {
 
 const replyHTML = async (ctx, html, otherOptions = {}) => {
   const res = await ctx.replyWithHTML(html, otherOptions);
-  let deleteAfter = true;
-  if (otherOptions.deleteAfter) {
-    deleteAfter = otherOptions.deleteAfter;
+  let keepMessages = false;
+  if (otherOptions.keepMessages) {
+    keepMessages = otherOptions.keepMessages;
   }
-  if (deleteAfter && res?.message_id) {
+  if (!keepMessages && res?.message_id) {
     ctx.session.messageIdsToDelete = [
       ...(ctx.session.messageIdsToDelete || []),
       res.message_id,
@@ -60,11 +60,11 @@ const replyMenuMDV2 = async (ctx, mdMessage, otherOptions = {}) => {
     otherOptions.reply_markup.inline_keyboard = [[mainMenuButton(menuText)]];
   }
   const res = await ctx.replyWithMarkdownV2(mdMessage, otherOptions);
-  let deleteAfter = true;
-  if (otherOptions.deleteAfter) {
-    deleteAfter = otherOptions.deleteAfter;
+  let keepMessages = false;
+  if (otherOptions.keepMessages) {
+    keepMessages = otherOptions.keepMessages;
   }
-  if (deleteAfter && res?.message_id) {
+  if (!keepMessages && res?.message_id) {
     ctx.session.messageIdsToDelete = [
       ...(ctx.session.messageIdsToDelete || []),
       res.message_id,
@@ -92,11 +92,11 @@ const replyMenu = async (ctx, mdMessage, otherOptions = {}) => {
     otherOptions.reply_markup.inline_keyboard = [[mainMenuButton(menuText)]];
   }
   const res = await ctx.reply(mdMessage, otherOptions);
-  let deleteAfter = true;
-  if (otherOptions.deleteAfter) {
-    deleteAfter = otherOptions.deleteAfter;
+  let keepMessages = false;
+  if (otherOptions.keepMessages) {
+    keepMessages = otherOptions.keepMessages;
   }
-  if (deleteAfter && res?.message_id) {
+  if (!keepMessages && res?.message_id) {
     ctx.session.messageIdsToDelete = [
       ...(ctx.session.messageIdsToDelete || []),
       res.message_id,
@@ -125,11 +125,11 @@ const replyMenuHTML = async (ctx, mdMessage, otherOptions = {}) => {
     otherOptions.reply_markup.inline_keyboard = [[mainMenuButton(menuText)]];
   }
   const res = await ctx.replyWithHTML(mdMessage, otherOptions);
-  let deleteAfter = true;
-  if (otherOptions.deleteAfter) {
-    deleteAfter = otherOptions.deleteAfter;
+  let keepMessages = false;
+  if (otherOptions.keepMessages) {
+    keepMessages = otherOptions.keepMessages;
   }
-  if (deleteAfter && res?.message_id) {
+  if (!keepMessages && res?.message_id) {
     ctx.session.messageIdsToDelete = [
       ...(ctx.session.messageIdsToDelete || []),
       res.message_id,
@@ -157,11 +157,11 @@ const replyMenuPhoto = async (ctx, photo, otherOptions = {}) => {
     otherOptions.reply_markup.inline_keyboard = [[mainMenuButton(menuText)]];
   }
   const res = await ctx.replyWithPhoto(photo, otherOptions);
-  let deleteAfter = true;
-  if (otherOptions.deleteAfter) {
-    deleteAfter = otherOptions.deleteAfter;
+  let keepMessages = false;
+  if (otherOptions.keepMessages) {
+    keepMessages = otherOptions.keepMessages;
   }
-  if (deleteAfter && res?.message_id) {
+  if (!keepMessages && res?.message_id) {
     ctx.session.messageIdsToDelete = [
       ...(ctx.session.messageIdsToDelete || []),
       res.message_id,

@@ -17,13 +17,15 @@ const mainMenuHandler = async (ctx, next) => {
   //Manually leaving scenes because it might be called before the stage middleware
   ctx.session.__scenes = {};
 
+  if (ctx.message?.text === "/start") {
+    await replyText(ctx, "Welcome to the Endubis Wallet Bot 🛅", {
+      ...Markup.keyboard([["🏠 Main Menu"]]).resize(),
+      keepMessages: true,
+    });
+  }
   if (ctx.session.loggedInXpub) {
     if (ctx.message?.text === "/start") {
-      await replyText(
-        ctx,
-        "👋 Welcome back to your wallet",
-        Markup.keyboard([["🏠 Main Menu"]]).resize()
-      );
+      await replyText(ctx, "👋 Welcome back to your wallet");
     }
     return replyHTML(
       ctx,
@@ -42,11 +44,6 @@ const mainMenuHandler = async (ctx, next) => {
       ])
     );
   } else {
-    await replyText(
-      ctx,
-      "Welcome to the Endubis Wallet 🛅",
-      Markup.keyboard([["🏠 Main Menu"]]).resize()
-    );
     return replyHTML(
       ctx,
       `Please <b>CREATE</b> or <b>RESTORE</b> a wallet to get started`,
